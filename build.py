@@ -122,7 +122,8 @@ def main(argv : list):
             except yaml.YAMLError as exc:
                 print(exc)
     
-    print(check_output(csmm + ' extract "' + str(file) + '" "' + file.stem + '"', encoding="utf-8"))
+    print("Extracting "+str(file)+" to "+file.stem+"...")
+    check_output(csmm + ' extract "' + str(file) + '" "' + file.stem + '"', encoding="utf-8")
     #status = check_output(csmm + ' status "' + file.stem + '"', encoding="utf-8")
 
     mapsConfig = dict()
@@ -133,12 +134,12 @@ def main(argv : list):
             print(exc)
 
     csvFilePath = Path(file.stem + '/csmm_pending_changes.csv')
+    id = 0
     with open(csvFilePath, 'w+', newline='', encoding='utf8') as csvfile:
         fieldnames = ['id', 'mapSet', 'zone', 'order', 'practiceBoard', 'name', 'yaml']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
 
-        id = 0
         for mapSet in mapsConfig:
             practiceBoardName = ""
             for zone in mapsConfig[mapSet]:
@@ -156,7 +157,10 @@ def main(argv : list):
                     id += 1
                     order += 1
 
+    print("Saving " + str(id) + " maps to " + file.stem + "...")
     print(check_output(csmm + ' save "' + file.stem + '"', encoding="utf-8"))
+
+    print("Packing " + file.stem + " to WBFS file...")
     print(check_output(csmm + ' pack "' + file.stem + '" --force', encoding="utf-8"))
 
 if __name__ == "__main__":

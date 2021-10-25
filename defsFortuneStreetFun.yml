@@ -8,7 +8,6 @@
   - CatMap
   - Cloverland
   - CrestOfFlames
-  1:
   - Crossroads
   - Downhill
   - DreamWorld
@@ -16,7 +15,7 @@
   - Freighter
   - FSSmartFestival
   - FSSmartMonsterHouse
-  2:
+  1:
   - FSSmartSilkRoad
   - Geoglyph
   - GoodybagLair
@@ -25,9 +24,6 @@
   - InsideOut
   - Karo
   - KingOfTheHill
-1:
-  practiceBoard: Playground
-  0:
   - LakeMountain
   - LibraryOfTheAncients
   - MaharataIslands
@@ -35,7 +31,7 @@
   - MoonCity
   - PhantomTrain
   - Playground
-  1:
+  2:
   - Pollen
   - PrimitiveEra
   - Rabanastre
@@ -43,7 +39,55 @@
   - SeabedShrine
   - ShellIsland
   - ShellIsleRedux
+  - Skullboard
+  - Spirograph
+  - SuitsMap
+  - TheAmericas
+  - ToadsHouse
+  - VennDiagram
+  - Vent
+  - Vulvainseln
+1:
+  practiceBoard: Playground
+  0:
+  - Abwarten
+  - Anchor
+  - Bakerman
+  - CasinoTown
+  - CatMap
+  - Cloverland
+  - CrestOfFlames
+  - Crossroads
+  - Downhill
+  - DreamWorld
+  - FacingWorlds
+  - Freighter
+  - FSSmartFestival
+  - FSSmartMonsterHouse
+  1:
+  - FSSmartSilkRoad
+  - Geoglyph
+  - GoodybagLair
+  - Hampelmann
+  - Hell
+  - InsideOut
+  - Karo
+  - KingOfTheHill
+  - LakeMountain
+  - LibraryOfTheAncients
+  - MaharataIslands
+  - Metamorph
+  - MoonCity
+  - PhantomTrain
+  - Playground
   2:
+  - Pollen
+  - PrimitiveEra
+  - Rabanastre
+  - Schneggl
+  - SeabedShrine
+  - ShellIsland
+  - ShellIsleRedux
   - Skullboard
   - Spirograph
   - SuitsMap
