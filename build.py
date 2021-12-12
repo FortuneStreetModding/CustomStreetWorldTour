@@ -122,8 +122,11 @@ def main(argv : list):
             except yaml.YAMLError as exc:
                 print(exc)
     
-    print("Extracting "+str(file)+" to "+file.stem+"...")
-    check_output(csmm + ' extract "' + str(file) + '" "' + file.stem + '"', encoding="utf-8")
+    if(Path(file.stem).is_dir() and Path(file.stem).exists()):
+        print("Would extract "+str(file)+" to "+file.stem+" but it already exists")
+    else:
+        print("Extracting "+str(file)+" to "+file.stem+"...")
+        check_output(csmm + ' extract "' + str(file) + '" "' + file.stem + '"', encoding="utf-8")
     #status = check_output(csmm + ' status "' + file.stem + '"', encoding="utf-8")
 
     mapsConfig = dict()
