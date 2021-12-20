@@ -6,6 +6,7 @@ if sys.version_info < MIN_PYTHON:
 
 from subprocess import check_output
 from pathlib import Path
+from dataclasses import dataclass
 
 import os
 import json
@@ -13,38 +14,64 @@ import urllib.request
 import csv
 import yaml
 import gdown
+import platform
+
+FORCE_DOWNLOAD_TOOLS = True
+EXECUTABLE_EXTENSION = ".exe" if platform.system() == "Windows" else ""
+DOWNLOAD_URL_WIT = {
+    "Windows": "https://wit.wiimm.de/download/wit-v3.04a-r8427-cygwin64.zip",
+    "Darwin": "https://wit.wiimm.de/download/wit-v3.04a-r8427-mac.tar.gz",
+    "Linux": "https://wit.wiimm.de/download/wit-v3.04a-r8427-x86_64.tar.gz"
+}[platform.system()]
+DOWNLOAD_URL_CSMM = "https://api.github.com/repos/FortuneStreetModding/csmm-qt/releases/latest"
+
+@dataclass
+class FileTypeInfo:
+    type: str
+    id6: str
+    fileSize: int
+    region: str
+    filePath: str
 
 def downloadLatestReleaseFromGithub(executable : str, url : str):
     _json = json.loads(urllib.request.urlopen(urllib.request.Request(url,
         headers={'Accept': 'application/vnd.github.v3+json'},
     )).read())
     for asset in _json['assets']:
-        if asset['name'].endswith(".zip"):
+        if platform.system().lower() in asset['name']:
             print("downloading " + executable + " from " + asset['browser_download_url'] + "...")
             zipFileDownload = urllib.request.urlretrieve(asset['browser_download_url'], asset['name'])[0]
             print("extracting " + zipFileDownload+ "...")
             gdown.extractall(zipFileDownload)
             os.remove(zipFileDownload)
-            
 
-def findExecutable(executable : str, githubLatestUrl : str = "") -> str:
+def findExecutable(executable : str, downloadUrl : str = "") -> str:
     try:
+        if FORCE_DOWNLOAD_TOOLS:
+            raise OSError
         check_output(executable + " --help", encoding="utf-8")
         return executable
     except OSError:
-        candidates = list(Path().glob('**/' + executable + "*"))
+        candidates = list(Path().glob('**/' + executable + EXECUTABLE_EXTENSION))
         for candidate in candidates:
             try:
                 check_output(str(candidate) + " --help", encoding="utf-8")
                 return str(candidate)
             except OSError:
                 pass
-    if githubLatestUrl:
-        try:
-            downloadLatestReleaseFromGithub(executable, githubLatestUrl)
-            return findExecutable(executable)
-        except Exception:
-            print("failed downloading " + executable)
+    if downloadUrl:
+        if 'github' in downloadUrl:
+            try:
+                downloadLatestReleaseFromGithub(executable, downloadUrl)
+                return findExecutable(executable)
+            except Exception as err:
+                print("failed downloading " + executable + ": " + str(err))
+        else:
+            try:
+                download(".", downloadUrl)
+                return findExecutable(executable)
+            except Exception as err:
+                print("failed downloading " + executable + ": " + str(err))
     return ""
 
 def download(path : str, url : str):
@@ -52,27 +79,57 @@ def download(path : str, url : str):
     if 'drive.google.com' in url:
         zipFileDownload = gdown.download(url, quiet=False)
     else:
-        zipFileDownload = urllib.request.urlretrieve(url)[0]
+        lastUrlPart = url.rsplit('/', 1)[-1]
+        zipFileDownload = urllib.request.urlretrieve(url, lastUrlPart)[0]
     print("extracting " + zipFileDownload + " to " + path +"...")
     gdown.extractall(zipFileDownload, path)
     os.remove(zipFileDownload)
 
+def getValidCandidates(wit : str) -> list[FileTypeInfo]:
+    validCandidates = []
+    output = check_output(wit + ' filetype . --long --long --ignore-fst', encoding="utf-8")
+    print(output)
+    a,b,c = output.partition("---\n")
+    candidates = filter(None, c.splitlines())
+    for candidate in candidates:
+        attributes = candidate.split(maxsplit = 5)
+        type = attributes[0]
+        id6 = attributes[1]
+        fileSize = attributes[2]
+        region = attributes[3]
+        filePath = attributes[5]
+        if id6.startswith("ST7") and id6.endswith("01") and (type.startswith("ISO") or type.startswith("WBFS")):
+            validCandidates.append(FileTypeInfo(type, id6, int(fileSize), region, filePath))
+    return validCandidates
+
 def main(argv : list):
-    argv.append("ST7P01.wbfs")
-    if len(argv) < 1:
-        print("Provide the path to the Fortune Street iso/wbfs file")
-        sys.exit()
-    file = Path(argv[0])
-    
-    if not file.is_file():
-        print(argv[0] + " does not exist or is not a file")
+    wit = findExecutable("wit", DOWNLOAD_URL_WIT)
+    if not wit:
+        print("Could not find wit executable")
         sys.exit()
     
-    csmm = findExecutable("csmm", "https://api.github.com/repos/FortuneStreetModding/csmm-qt/releases/latest")
+    csmm = findExecutable("csmm", DOWNLOAD_URL_CSMM)
     if not csmm:
         print("Could not find csmm executable")
         sys.exit()
 
+    if len(argv) < 1:
+        validCandidates = getValidCandidates(wit)
+        if len(validCandidates) == 0:
+            print("Provide the path to the Fortune Street iso/wbfs file or put such a file into the same directory as this script")
+            sys.exit()
+        elif len(validCandidates) == 1:
+            file = Path(validCandidates[0].filePath)
+            print(f'Using {file} as input')
+        else:
+            print("There are multiple Fortune Street iso/wbfs in this directory. Either remove them so that only one remains or provide the path to the Fortune Street iso/wbfs file")
+            sys.exit()
+    else:
+        file = Path(argv[0])
+        if not file.is_file():
+            print(argv[0] + " does not exist or is not a file")
+            sys.exit()
+   
     backgrounds = dict()
     with open('fortunestreetmodding.github.io/_data/backgrounds.yml', "r", encoding='utf8') as stream:
         try:
@@ -130,7 +187,7 @@ def main(argv : list):
     #status = check_output(csmm + ' status "' + file.stem + '"', encoding="utf-8")
 
     mapsConfig = dict()
-    with open('defsFortuneStreetFun.yml', "r", encoding='utf8') as stream:
+    with open('customStreetWorldTour.yml', "r", encoding='utf8') as stream:
         try:
             mapsConfig = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
@@ -161,8 +218,12 @@ def main(argv : list):
                     order += 1
 
     print("Saving " + str(id) + " maps to " + file.stem + "...")
-    print(check_output(csmm + ' save "' + file.stem + '"', encoding="utf-8"))
+    output = check_output(csmm + ' save "' + file.stem + '"', encoding="utf-8")
+    print(output)
 
+    if 'error' in output.lower():
+        sys.exit(1)
+    
     print("Packing " + file.stem + " to WBFS file...")
     print(check_output(csmm + ' pack "' + file.stem + '" --force', encoding="utf-8"))
 
