@@ -174,7 +174,7 @@ def downloadBackgroundsAndMusic(yamlMaps : list[Path]):
             except yaml.YAMLError as exc:
                 print(exc)
 
-def createMapListFile(yamlMaps : list[Path], outputCsvFilePath : Path):
+def createMapListFile(yamlMaps : list[Path], outputCsvFilePath : Path) -> int:
     mapsConfig = dict()
     with open('customStreetWorldTour.yml', "r", encoding='utf8') as stream:
         try:
@@ -204,6 +204,7 @@ def createMapListFile(yamlMaps : list[Path], outputCsvFilePath : Path):
                     writer.writerow({'id': id, 'mapSet': mapSet, 'zone': zone, 'order': order, 'practiceBoard': practiceBoard, 'name': mapDir, 'yaml': yamlPath})
                     id += 1
                     order += 1
+    return id
 
 def main(argv : list):
     csmm = findExecutable("csmm", url=DOWNLOAD_URL_CSMM)
@@ -229,9 +230,9 @@ def main(argv : list):
         print(f'Extracting {str(file)} to {file.stem}...')
         check_output(f'{csmm} extract "{str(file)}" "{file.stem}"', encoding="utf-8")
 
-    createMapListFile(yamlMaps, Path(file.stem + '/csmm_pending_changes.csv'))
+    mapCount = createMapListFile(yamlMaps, Path(file.stem + '/csmm_pending_changes.csv'))
 
-    print(f'Saving {str(id)} maps to {file.stem}...')
+    print(f'Saving {str(mapCount)} maps to {file.stem}...')
     output = check_output(f'{csmm} save "{file.stem}"', encoding="utf-8")
     print(output)
 
