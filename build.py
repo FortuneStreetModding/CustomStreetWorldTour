@@ -15,9 +15,15 @@ import csv
 import yaml
 import gdown
 import platform
+import tempfile
 
 EXECUTABLE_EXTENSION = ".exe" if platform.system() == "Windows" else ""
 DOWNLOAD_URL_CSMM = "https://api.github.com/repos/FortuneStreetModding/csmm-qt/releases/latest"
+
+@dataclass
+class ArcPatch:
+    arcFilePath: str
+    fileReplacements: list[str]
 
 @dataclass
 class FileTypeInfo:
@@ -206,6 +212,48 @@ def createMapListFile(yamlMaps : list[Path], outputCsvFilePath : Path) -> int:
                     order += 1
     return id
 
+def pngPathToArcPaths(pngPath : Path) -> list[Path]:
+    arcPaths = []
+    arcPath = pngPath.parent
+    lastPart = arcPath.with_suffix('').as_posix().rsplit("_", 1)
+    if lastPart and len(lastPart) > 1:
+        lastPart = lastPart[1]
+        if "all" in lastPart.lower():
+            jpArcBaseName = arcPath.with_suffix('').name.removesuffix(f'_{lastPart}')
+            lang = ""
+            for lang in ["", "DE", "EN", "ES", "FR", "IT", "UK"]:
+                langDir = f'lang{lang}/'
+                suffix = ""
+                if lang:
+                    suffix = f'_{lang}'
+                else:
+                    langDir = ''
+                arcPaths.append(Path(arcPath.parent / Path(langDir + jpArcBaseName + suffix + arcPath.suffix)))
+            return arcPaths
+    arcPaths.append(arcPath)
+    return arcPaths
+
+def patchArcs(dir : str, wszst : str, wimgt : str):
+    pngPaths = list(Path().glob('files/**/*.png'))
+    arcsToBePatched = {}
+    for pngPath in pngPaths:
+        arcPaths = pngPathToArcPaths(pngPath)
+        for arcPath in arcPaths:
+            arcPath = Path(dir) / arcPath
+            if arcPath not in arcsToBePatched:
+                arcsToBePatched[arcPath.as_posix()] = []
+            arcsToBePatched[arcPath.as_posix()].append(pngPath)
+    for arcToBePatched in arcsToBePatched:
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            print(check_output(f'{wszst} EXTRACT {arcToBePatched} --dest {tmpdirname} --overwrite', encoding="utf-8"))
+            for pngPath in arcsToBePatched[arcToBePatched]:
+                pngPath = Path(pngPath)
+                basename_tpl_0 = Path(pngPath.stem)
+                basename_tpl = basename_tpl_0.with_suffix(".tpl")
+                tplPath = Path(tmpdirname) / Path(f'arc/timg/{basename_tpl}')
+                print(check_output(f'{wimgt} ENCODE {pngPath.as_posix()} --dest {tplPath.as_posix()} --overwrite', encoding="utf-8"))
+            print(check_output(f'{wszst} CREATE {tmpdirname} --dest {arcToBePatched} --overwrite', encoding="utf-8"))
+
 def main(argv : list):
     csmm = findExecutable("csmm", downloadUrl=DOWNLOAD_URL_CSMM)
     if not csmm:
@@ -219,6 +267,16 @@ def main(argv : list):
         print("Could not find wit executable")
         sys.exit()
 
+    wszst = findExecutable("wszst", searchPath=searchPath)
+    if not wszst:
+        print("Could not find wszst executable")
+        sys.exit()
+
+    wimgt = findExecutable("wimgt", searchPath=searchPath)
+    if not wimgt:
+        print("Could not find wimgt executable")
+        sys.exit()
+
     yamlMaps = list(Path().glob('fortunestreetmodding.github.io/_maps/*/*.yaml'))
     downloadBackgroundsAndMusic(yamlMaps)
 
@@ -228,6 +286,9 @@ def main(argv : list):
     else:
         print(f'Extracting {str(file)} to {file.stem}...')
         check_output(f'{csmm} extract "{str(file)}" "{file.stem}"', encoding="utf-8")
+
+    print(f'Patching arc files...')
+    patchArcs(file.stem, wszst, wimgt)
 
     mapCount = createMapListFile(yamlMaps, Path(file.stem + '/csmm_pending_changes.csv'))
 
