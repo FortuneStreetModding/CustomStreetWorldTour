@@ -16,13 +16,7 @@ import yaml
 import gdown
 import platform
 
-FORCE_DOWNLOAD_TOOLS = True
 EXECUTABLE_EXTENSION = ".exe" if platform.system() == "Windows" else ""
-DOWNLOAD_URL_WIT = {
-    "Windows": "https://wit.wiimm.de/download/wit-v3.04a-r8427-cygwin64.zip",
-    "Darwin": "https://wit.wiimm.de/download/wit-v3.04a-r8427-mac.tar.gz",
-    "Linux": "https://wit.wiimm.de/download/wit-v3.04a-r8427-x86_64.tar.gz"
-}[platform.system()]
 DOWNLOAD_URL_CSMM = "https://api.github.com/repos/FortuneStreetModding/csmm-qt/releases/latest"
 
 @dataclass
@@ -45,33 +39,38 @@ def downloadLatestReleaseFromGithub(executable : str, url : str):
             gdown.extractall(zipFileDownload)
             os.remove(zipFileDownload)
 
-def findExecutable(executable : str, downloadUrl : str = "") -> str:
+def findExecutable(executable : str, downloadUrl : str = "", searchPath : Path = None) -> str:
+    if searchPath:
+        candidate = f'{str(searchPath.as_posix())}/{executable}{EXECUTABLE_EXTENSION}'
+        try:
+            check_output(f'{candidate} --help', encoding="utf-8")
+            return str(candidate)
+        except OSError:
+            pass
+    candidates = list(Path().glob('**/' + executable + EXECUTABLE_EXTENSION))
+    for candidate in candidates:
+        try:
+            check_output(str(candidate) + " --help", encoding="utf-8")
+            return str(candidate)
+        except OSError:
+            pass
     try:
-        if FORCE_DOWNLOAD_TOOLS:
-            raise OSError
         check_output(executable + " --help", encoding="utf-8")
         return executable
     except OSError:
-        candidates = list(Path().glob('**/' + executable + EXECUTABLE_EXTENSION))
-        for candidate in candidates:
-            try:
-                check_output(str(candidate) + " --help", encoding="utf-8")
-                return str(candidate)
-            except OSError:
-                pass
-    if downloadUrl:
-        if 'github' in downloadUrl:
-            try:
-                downloadLatestReleaseFromGithub(executable, downloadUrl)
-                return findExecutable(executable)
-            except Exception as err:
-                print("failed downloading " + executable + ": " + str(err))
-        else:
-            try:
-                download(".", downloadUrl)
-                return findExecutable(executable)
-            except Exception as err:
-                print("failed downloading " + executable + ": " + str(err))
+        if downloadUrl:
+            if 'github' in downloadUrl:
+                try:
+                    downloadLatestReleaseFromGithub(executable, downloadUrl)
+                    return findExecutable(executable)
+                except Exception as err:
+                    print("failed downloading " + executable + ": " + str(err))
+            else:
+                try:
+                    download(".", downloadUrl)
+                    return findExecutable(executable)
+                except Exception as err:
+                    print("failed downloading " + executable + ": " + str(err))
     return ""
 
 def download(path : str, url : str):
@@ -102,17 +101,12 @@ def getValidCandidates(wit : str) -> list[FileTypeInfo]:
             validCandidates.append(FileTypeInfo(type, id6, int(fileSize), region, filePath))
     return validCandidates
 
-def main(argv : list):
-    wit = findExecutable("wit", DOWNLOAD_URL_WIT)
-    if not wit:
-        print("Could not find wit executable")
-        sys.exit()
-    
-    csmm = findExecutable("csmm", DOWNLOAD_URL_CSMM)
-    if not csmm:
-        print("Could not find csmm executable")
-        sys.exit()
+def fetchLastLineOfString(string : str):
+    lines = string.splitlines()
+    nonEmptyLines = list(filter(None, lines))
+    return nonEmptyLines[-1]
 
+def getInputFortuneStreetFile(argv : list, wit : str) -> str:
     if len(argv) < 1:
         validCandidates = getValidCandidates(wit)
         if len(validCandidates) == 0:
@@ -121,6 +115,7 @@ def main(argv : list):
         elif len(validCandidates) == 1:
             file = Path(validCandidates[0].filePath)
             print(f'Using {file} as input')
+            return file
         else:
             print("There are multiple Fortune Street iso/wbfs in this directory. Either remove them so that only one remains or provide the path to the Fortune Street iso/wbfs file")
             sys.exit()
@@ -129,6 +124,23 @@ def main(argv : list):
         if not file.is_file():
             print(argv[0] + " does not exist or is not a file")
             sys.exit()
+        return file
+    return None
+
+def main(argv : list):
+    csmm = findExecutable("csmm", url=DOWNLOAD_URL_CSMM)
+    if not csmm:
+        print("Could not find csmm executable")
+        sys.exit()
+
+    searchPath = Path(fetchLastLineOfString(check_output(f'{csmm} download-tools', encoding="utf-8")))
+
+    wit = findExecutable("wit", searchPath=searchPath)
+    if not wit:
+        print("Could not find wit executable")
+        sys.exit()
+
+    file = getInputFortuneStreetFile(argv, wit)
    
     backgrounds = dict()
     with open('fortunestreetmodding.github.io/_data/backgrounds.yml', "r", encoding='utf8') as stream:
