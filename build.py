@@ -212,37 +212,42 @@ def createMapListFile(yamlMaps : list[Path], outputCsvFilePath : Path) -> int:
                     order += 1
     return id
 
-def pngPathToArcPaths(pngPath : Path) -> list[Path]:
-    arcPaths = []
-    arcPath = pngPath.parent
-    lastPart = arcPath.with_suffix('').as_posix().rsplit("_", 1)
-    if lastPart and len(lastPart) > 1:
-        lastPart = lastPart[1]
-        if "all" in lastPart.lower():
-            jpArcBaseName = arcPath.with_suffix('').name.removesuffix(f'_{lastPart}')
-            lang = ""
-            for lang in ["", "DE", "EN", "ES", "FR", "IT", "UK"]:
+def resolveAll(path : Path, isLocalizeType : bool) -> list[Path]:
+    paths = []
+    if "all" in path.with_suffix('').suffix.lower():
+        baseName = path.with_suffix('').with_suffix('').name
+        lang = ""
+        for lang in ["JP", "DE", "EN", "ES", "FR", "IT", "UK"]:
+            if isLocalizeType:
+                langDir = ""
+                if lang == "ES":
+                    lang = "su"
+                suffix = "." + lang.lower()
+            else:
+                if lang == "JP":
+                    lang = ""
                 langDir = f'lang{lang}/'
                 suffix = ""
                 if lang:
                     suffix = f'_{lang}'
                 else:
                     langDir = ''
-                arcPaths.append(Path(arcPath.parent / Path(langDir + jpArcBaseName + suffix + arcPath.suffix)))
-            return arcPaths
-    arcPaths.append(arcPath)
-    return arcPaths
+            paths.append(Path(path.parent / Path(langDir + baseName + suffix + path.suffix)))
+        return paths
+    paths.append(path)
+    return paths
 
 def patchArcs(dir : str, wszst : str, wimgt : str):
     pngPaths = list(Path().glob('files/**/*.png'))
     arcsToBePatched = {}
     for pngPath in pngPaths:
-        arcPaths = pngPathToArcPaths(pngPath)
+        arcPaths = resolveAll(pngPath.parent, False)
         for arcPath in arcPaths:
             arcPath = Path(dir) / arcPath
-            if arcPath not in arcsToBePatched:
-                arcsToBePatched[arcPath.as_posix()] = []
-            arcsToBePatched[arcPath.as_posix()].append(pngPath)
+            arcPathStr = arcPath.as_posix()
+            if arcPathStr not in arcsToBePatched:
+                arcsToBePatched[arcPathStr] = []
+            arcsToBePatched[arcPathStr].append(pngPath)
     for arcToBePatched in arcsToBePatched:
         with tempfile.TemporaryDirectory() as tmpdirname:
             print(check_output(f'{wszst} EXTRACT {arcToBePatched} --dest {tmpdirname} --overwrite', encoding="utf-8"))
@@ -253,6 +258,30 @@ def patchArcs(dir : str, wszst : str, wimgt : str):
                 tplPath = Path(tmpdirname) / Path(f'arc/timg/{basename_tpl}')
                 print(check_output(f'{wimgt} ENCODE {pngPath.as_posix()} --dest {tplPath.as_posix()} --overwrite', encoding="utf-8"))
             print(check_output(f'{wszst} CREATE {tmpdirname} --dest {arcToBePatched} --overwrite', encoding="utf-8"))
+
+def patchLocalize(dir : str):
+    csvDeltas = list(Path().glob('files/localize/*.csv'))
+    csvsToBePatched = {}
+    for csvDelta in csvDeltas:
+        csvPaths = resolveAll(csvDelta, True)
+        for csvPath in csvPaths:
+            csvPath = Path(dir) / csvPath
+            csvPathStr = csvPath.as_posix()
+            if csvPathStr not in csvsToBePatched:
+                csvsToBePatched[csvPathStr] = []
+            csvsToBePatched[csvPathStr].append(csvDelta)
+    for csvToBePatched in csvsToBePatched:
+        for csvDelta in csvsToBePatched[csvToBePatched]:
+            with open(csvDelta, mode='r', encoding='utf-8') as deltafile:
+                reader = csv.reader(deltafile)
+                delta = {rows[0]:rows[1] for rows in reader}
+            with open(csvToBePatched, mode='r', encoding='utf-8') as csvfile:
+                reader = csv.reader(csvfile)
+                csvOutput = {rows[0]:rows[1] for rows in reader}
+            csvOutput.update(delta)
+            with open(csvToBePatched, mode='w', newline='', encoding='utf-8') as csvfile:
+                writer = csv.writer(csvfile)
+                writer.writerows(csvOutput.items())
 
 def main(argv : list):
     csmm = findExecutable("csmm", downloadUrl=DOWNLOAD_URL_CSMM)
@@ -289,6 +318,9 @@ def main(argv : list):
 
     print(f'Patching arc files...')
     patchArcs(file.stem, wszst, wimgt)
+
+    print(f'Patching localization files...')
+    patchLocalize(file.stem)
 
     mapCount = createMapListFile(yamlMaps, Path(file.stem + '/csmm_pending_changes.csv'))
 
