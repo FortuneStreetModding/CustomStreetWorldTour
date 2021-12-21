@@ -219,13 +219,12 @@ def main(argv : list):
         print("Could not find wit executable")
         sys.exit()
 
-    file = getInputFortuneStreetFile(argv, wit)
-    
     yamlMaps = list(Path().glob('fortunestreetmodding.github.io/_maps/*/*.yaml'))
     downloadBackgroundsAndMusic(yamlMaps)
 
+    file = getInputFortuneStreetFile(argv, wit)
     if(Path(file.stem).is_dir() and Path(file.stem).exists()):
-        print(f'Would extract {str(file)} to {file.stem} but it already exists')
+        print(f'Would extract {str(file)} to {file.stem} but it already exists. The directory is reused.')
     else:
         print(f'Extracting {str(file)} to {file.stem}...')
         check_output(f'{csmm} extract "{str(file)}" "{file.stem}"', encoding="utf-8")
