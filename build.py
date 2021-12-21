@@ -125,31 +125,14 @@ def getInputFortuneStreetFile(argv : list, wit : str) -> str:
             print(argv[0] + " does not exist or is not a file")
             sys.exit()
         return file
-    return None
 
-def main(argv : list):
-    csmm = findExecutable("csmm", url=DOWNLOAD_URL_CSMM)
-    if not csmm:
-        print("Could not find csmm executable")
-        sys.exit()
-
-    searchPath = Path(fetchLastLineOfString(check_output(f'{csmm} download-tools', encoding="utf-8")))
-
-    wit = findExecutable("wit", searchPath=searchPath)
-    if not wit:
-        print("Could not find wit executable")
-        sys.exit()
-
-    file = getInputFortuneStreetFile(argv, wit)
-   
+def downloadBackgroundsAndMusic(yamlMaps : list[Path]):
     backgrounds = dict()
     with open('fortunestreetmodding.github.io/_data/backgrounds.yml', "r", encoding='utf8') as stream:
         try:
             backgrounds = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
             print(exc)
-
-    yamlMaps = list(Path().glob('fortunestreetmodding.github.io/_maps/*/*.yaml'))
     for yamlMap in yamlMaps:
         # print("Scanning " + yamlMap.name + "...")
         print("Scanning " + yamlMap.parent.name)
@@ -190,14 +173,8 @@ def main(argv : list):
                         download(str(yamlMap.parent), yamlContent['music']['download'])
             except yaml.YAMLError as exc:
                 print(exc)
-    
-    if(Path(file.stem).is_dir() and Path(file.stem).exists()):
-        print("Would extract "+str(file)+" to "+file.stem+" but it already exists")
-    else:
-        print("Extracting "+str(file)+" to "+file.stem+"...")
-        check_output(csmm + ' extract "' + str(file) + '" "' + file.stem + '"', encoding="utf-8")
-    #status = check_output(csmm + ' status "' + file.stem + '"', encoding="utf-8")
 
+def createMapListFile(yamlMaps : list[Path], outputCsvFilePath : Path):
     mapsConfig = dict()
     with open('customStreetWorldTour.yml', "r", encoding='utf8') as stream:
         try:
@@ -205,9 +182,8 @@ def main(argv : list):
         except yaml.YAMLError as exc:
             print(exc)
 
-    csvFilePath = Path(file.stem + '/csmm_pending_changes.csv')
     id = 0
-    with open(csvFilePath, 'w+', newline='', encoding='utf8') as csvfile:
+    with open(outputCsvFilePath, 'w+', newline='', encoding='utf8') as csvfile:
         fieldnames = ['id', 'mapSet', 'zone', 'order', 'practiceBoard', 'name', 'yaml']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
@@ -228,6 +204,32 @@ def main(argv : list):
                     writer.writerow({'id': id, 'mapSet': mapSet, 'zone': zone, 'order': order, 'practiceBoard': practiceBoard, 'name': mapDir, 'yaml': yamlPath})
                     id += 1
                     order += 1
+
+def main(argv : list):
+    csmm = findExecutable("csmm", url=DOWNLOAD_URL_CSMM)
+    if not csmm:
+        print("Could not find csmm executable")
+        sys.exit()
+
+    searchPath = Path(fetchLastLineOfString(check_output(f'{csmm} download-tools', encoding="utf-8")))
+
+    wit = findExecutable("wit", searchPath=searchPath)
+    if not wit:
+        print("Could not find wit executable")
+        sys.exit()
+
+    file = getInputFortuneStreetFile(argv, wit)
+    
+    yamlMaps = list(Path().glob('fortunestreetmodding.github.io/_maps/*/*.yaml'))
+    downloadBackgroundsAndMusic(yamlMaps)
+
+    if(Path(file.stem).is_dir() and Path(file.stem).exists()):
+        print("Would extract "+str(file)+" to "+file.stem+" but it already exists")
+    else:
+        print("Extracting "+str(file)+" to "+file.stem+"...")
+        check_output(csmm + ' extract "' + str(file) + '" "' + file.stem + '"', encoding="utf-8")
+
+    createMapListFile(yamlMaps, Path(file.stem + '/csmm_pending_changes.csv'))
 
     print("Saving " + str(id) + " maps to " + file.stem + "...")
     output = check_output(csmm + ' save "' + file.stem + '"', encoding="utf-8")
