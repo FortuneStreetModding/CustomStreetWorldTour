@@ -33,9 +33,9 @@ def downloadLatestReleaseFromGithub(executable : str, url : str):
     )).read())
     for asset in _json['assets']:
         if platform.system().lower() in asset['name']:
-            print("downloading " + executable + " from " + asset['browser_download_url'] + "...")
+            print(f'downloading {executable} from {asset["browser_download_url"]}...')
             zipFileDownload = urllib.request.urlretrieve(asset['browser_download_url'], asset['name'])[0]
-            print("extracting " + zipFileDownload+ "...")
+            print(f'extracting {zipFileDownload}...')
             gdown.extractall(zipFileDownload)
             os.remove(zipFileDownload)
 
@@ -44,18 +44,19 @@ def findExecutable(executable : str, downloadUrl : str = "", searchPath : Path =
         candidate = f'{str(searchPath.as_posix())}/{executable}{EXECUTABLE_EXTENSION}'
         try:
             check_output(f'{candidate} --help', encoding="utf-8")
-            return str(candidate)
+            return candidate
         except OSError:
             pass
     candidates = list(Path().glob('**/' + executable + EXECUTABLE_EXTENSION))
     for candidate in candidates:
         try:
-            check_output(str(candidate) + " --help", encoding="utf-8")
-            return str(candidate)
+            candidate = str(candidate)
+            check_output(f'{candidate} --help', encoding="utf-8")
+            return candidate
         except OSError:
             pass
     try:
-        check_output(executable + " --help", encoding="utf-8")
+        check_output(f'{executable} --help', encoding="utf-8")
         return executable
     except OSError:
         if downloadUrl:
@@ -64,29 +65,29 @@ def findExecutable(executable : str, downloadUrl : str = "", searchPath : Path =
                     downloadLatestReleaseFromGithub(executable, downloadUrl)
                     return findExecutable(executable)
                 except Exception as err:
-                    print("failed downloading " + executable + ": " + str(err))
+                    print(f'failed downloading {executable}: {str(err)}')
             else:
                 try:
                     download(".", downloadUrl)
                     return findExecutable(executable)
                 except Exception as err:
-                    print("failed downloading " + executable + ": " + str(err))
+                    print(f'failed downloading {executable}: {str(err)}')
     return ""
 
 def download(path : str, url : str):
-    print("downloading " + url + "...")
+    print(f'downloading {url}...')
     if 'drive.google.com' in url:
         zipFileDownload = gdown.download(url, quiet=False)
     else:
         lastUrlPart = url.rsplit('/', 1)[-1]
         zipFileDownload = urllib.request.urlretrieve(url, lastUrlPart)[0]
-    print("extracting " + zipFileDownload + " to " + path +"...")
+    print(f'extracting {zipFileDownload} to {path}...')
     gdown.extractall(zipFileDownload, path)
     os.remove(zipFileDownload)
 
 def getValidCandidates(wit : str) -> list[FileTypeInfo]:
     validCandidates = []
-    output = check_output(wit + ' filetype . --long --long --ignore-fst', encoding="utf-8")
+    output = check_output(f'{wit} filetype . --long --long --ignore-fst', encoding="utf-8")
     print(output)
     a,b,c = output.partition("---\n")
     candidates = filter(None, c.splitlines())
@@ -122,7 +123,7 @@ def getInputFortuneStreetFile(argv : list, wit : str) -> str:
     else:
         file = Path(argv[0])
         if not file.is_file():
-            print(argv[0] + " does not exist or is not a file")
+            print(f'{argv[0]} does not exist or is not a file')
             sys.exit()
         return file
 
@@ -134,8 +135,7 @@ def downloadBackgroundsAndMusic(yamlMaps : list[Path]):
         except yaml.YAMLError as exc:
             print(exc)
     for yamlMap in yamlMaps:
-        # print("Scanning " + yamlMap.name + "...")
-        print("Scanning " + yamlMap.parent.name)
+        print(f'Scanning {yamlMap.parent.name}')
         with open(yamlMap, "r", encoding='utf8') as stream:
             try:
                 yamlContent = yaml.safe_load(stream)
@@ -224,22 +224,22 @@ def main(argv : list):
     downloadBackgroundsAndMusic(yamlMaps)
 
     if(Path(file.stem).is_dir() and Path(file.stem).exists()):
-        print("Would extract "+str(file)+" to "+file.stem+" but it already exists")
+        print(f'Would extract {str(file)} to {file.stem} but it already exists')
     else:
-        print("Extracting "+str(file)+" to "+file.stem+"...")
-        check_output(csmm + ' extract "' + str(file) + '" "' + file.stem + '"', encoding="utf-8")
+        print(f'Extracting {str(file)} to {file.stem}...')
+        check_output(f'{csmm} extract "{str(file)}" "{file.stem}"', encoding="utf-8")
 
     createMapListFile(yamlMaps, Path(file.stem + '/csmm_pending_changes.csv'))
 
-    print("Saving " + str(id) + " maps to " + file.stem + "...")
-    output = check_output(csmm + ' save "' + file.stem + '"', encoding="utf-8")
+    print(f'Saving {str(id)} maps to {file.stem}...')
+    output = check_output(f'{csmm} save "{file.stem}"', encoding="utf-8")
     print(output)
 
     if 'error' in output.lower():
         sys.exit(1)
     
-    print("Packing " + file.stem + " to WBFS file...")
-    print(check_output(csmm + ' pack "' + file.stem + '" --force', encoding="utf-8"))
+    print(f'Packing {file.stem} to WBFS file...')
+    print(check_output(f'{csmm} pack "{file.stem}" --force', encoding="utf-8"))
 
 if __name__ == "__main__":
     main(sys.argv[1:])
