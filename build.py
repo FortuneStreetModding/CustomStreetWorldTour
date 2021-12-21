@@ -207,7 +207,7 @@ def createMapListFile(yamlMaps : list[Path], outputCsvFilePath : Path) -> int:
     return id
 
 def main(argv : list):
-    csmm = findExecutable("csmm", url=DOWNLOAD_URL_CSMM)
+    csmm = findExecutable("csmm", downloadUrl=DOWNLOAD_URL_CSMM)
     if not csmm:
         print("Could not find csmm executable")
         sys.exit()
