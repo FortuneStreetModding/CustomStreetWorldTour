@@ -61,23 +61,19 @@ def findExecutable(executable : str, downloadUrl : str = "", searchPath : Path =
             return candidate
         except OSError:
             pass
-    try:
-        check_output(f'{executable} --help', encoding="utf-8")
-        return executable
-    except OSError:
-        if downloadUrl:
-            if 'github' in downloadUrl:
-                try:
-                    downloadLatestReleaseFromGithub(executable, downloadUrl)
-                    return findExecutable(executable)
-                except Exception as err:
-                    print(f'failed downloading {executable}: {str(err)}')
-            else:
-                try:
-                    download(".", downloadUrl)
-                    return findExecutable(executable)
-                except Exception as err:
-                    print(f'failed downloading {executable}: {str(err)}')
+    if downloadUrl:
+        if 'github' in downloadUrl:
+            try:
+                downloadLatestReleaseFromGithub(executable, downloadUrl)
+                return findExecutable(executable)
+            except Exception as err:
+                print(f'failed downloading {executable}: {str(err)}')
+        else:
+            try:
+                download(".", downloadUrl)
+                return findExecutable(executable)
+            except Exception as err:
+                print(f'failed downloading {executable}: {str(err)}')
     return ""
 
 def download(path : str, url : str):
@@ -289,7 +285,7 @@ def main(argv : list):
         print("Could not find csmm executable")
         sys.exit()
 
-    searchPath = Path(fetchLastLineOfString(check_output(f'{csmm} download-tools', encoding="utf-8")))
+    searchPath = Path(fetchLastLineOfString(check_output(f'{csmm} download-tools --force', encoding="utf-8")))
 
     wit = findExecutable("wit", searchPath=searchPath)
     if not wit:
