@@ -12,6 +12,7 @@
   - DreamWorld
   - IS2UnderwaterMetropolis
   - CasinoTown
+  - IS2SophiesCave
   - Geoglyph
   - QueenBunny
   - PrimitiveEra
@@ -24,8 +25,8 @@
   - DSColossus
   - DSPeachsCastle
   - DSDelfinoPlaza
-  - DSRobbinHoodRuins
   1:
+  - DSRobbinHoodRuins
   - DSAlefgard
   - FSSmartSilkRoad
   - FSSmartFestival
@@ -49,8 +50,8 @@
   - Downhill
   - Freighter
   - GoodybagLair
-  - Hampelmann
   2:
+  - Hampelmann
   - Hell
   - Hotel
   - InsideOut
@@ -68,6 +69,7 @@
   - VennDiagram
   - Vent
   - Vulvainseln
+  - DKsJungleAdventure
 1:
   practiceBoard: Playground
   0:
@@ -82,6 +84,7 @@
   - DreamWorld
   - IS2UnderwaterMetropolis
   - CasinoTown
+  - IS2SophiesCave
   - Geoglyph
   - QueenBunny
   - PrimitiveEra
@@ -94,8 +97,8 @@
   - DSColossus
   - DSPeachsCastle
   - DSDelfinoPlaza
-  - DSRobbinHoodRuins
   1:
+  - DSRobbinHoodRuins
   - DSAlefgard
   - FSSmartSilkRoad
   - FSSmartFestival
@@ -119,8 +122,8 @@
   - Downhill
   - Freighter
   - GoodybagLair
-  - Hampelmann
   2:
+  - Hampelmann
   - Hell
   - Hotel
   - InsideOut
@@ -138,3 +141,4 @@
   - VennDiagram
   - Vent
   - Vulvainseln
+  - DKsJungleAdventure
