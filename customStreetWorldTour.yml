@@ -1,48 +1,69 @@
 0:
   practiceBoard: Karo
   0:
+  - MaharataIslands
+  - TheAmericas
+  - ShellIsland
+  - LakeMountain
+  - Cloverland
+  - MoonCity
+  - Gootrude
+  - IS2Skyscraper
+  - DreamWorld
+  - IS2UnderwaterMetropolis
+  - CasinoTown
+  - Geoglyph
+  - QueenBunny
+  - PrimitiveEra
+  - GKFLoatingContinent
+  - SeabedShrine
+  - Rabanastre
+  - LibraryOfTheAncients
+  - PhantomTrain
+  - DSYoshisIsland
+  - DSColossus
+  - DSPeachsCastle
+  - DSDelfinoPlaza
+  - DSRobbinHoodRuins
+  1:
+  - DSAlefgard
+  - FSSmartSilkRoad
+  - FSSmartFestival
+  - MobileSchool
+  - SmartAntarctica
+  - SmartZodiac
+  - SmartAquarium
+  - FSSmartMonsterHouse
+  - Bunnyland
+  - auMidnightTown
+  - 30thDragonlordsCastle
+  - 30thCrystalTower
+  - Skullboard
+  - FacingWorlds
   - Abwarten
   - Anchor
   - Bakerman
-  - CasinoTown
   - CatMap
-  - Cloverland
   - CrestOfFlames
   - Crossroads
   - Downhill
-  - DreamWorld
-  - FacingWorlds
   - Freighter
-  - FSSmartFestival
-  - FSSmartMonsterHouse
-  1:
-  - FSSmartSilkRoad
-  - Geoglyph
   - GoodybagLair
   - Hampelmann
+  2:
   - Hell
+  - Hotel
   - InsideOut
+  - Kanto
   - Karo
   - KingOfTheHill
-  - LakeMountain
-  - LibraryOfTheAncients
-  - MaharataIslands
   - Metamorph
-  - MoonCity
-  - PhantomTrain
   - Playground
-  2:
   - Pollen
-  - PrimitiveEra
-  - Rabanastre
   - Schneggl
-  - SeabedShrine
-  - ShellIsland
   - ShellIsleRedux
-  - Skullboard
   - Spirograph
   - SuitsMap
-  - TheAmericas
   - ToadsHouse
   - VennDiagram
   - Vent
@@ -50,48 +71,69 @@
 1:
   practiceBoard: Playground
   0:
+  - MaharataIslands
+  - TheAmericas
+  - ShellIsland
+  - LakeMountain
+  - Cloverland
+  - MoonCity
+  - Gootrude
+  - IS2Skyscraper
+  - DreamWorld
+  - IS2UnderwaterMetropolis
+  - CasinoTown
+  - Geoglyph
+  - QueenBunny
+  - PrimitiveEra
+  - GKFLoatingContinent
+  - SeabedShrine
+  - Rabanastre
+  - LibraryOfTheAncients
+  - PhantomTrain
+  - DSYoshisIsland
+  - DSColossus
+  - DSPeachsCastle
+  - DSDelfinoPlaza
+  - DSRobbinHoodRuins
+  1:
+  - DSAlefgard
+  - FSSmartSilkRoad
+  - FSSmartFestival
+  - MobileSchool
+  - SmartAntarctica
+  - SmartZodiac
+  - SmartAquarium
+  - FSSmartMonsterHouse
+  - Bunnyland
+  - auMidnightTown
+  - 30thDragonlordsCastle
+  - 30thCrystalTower
+  - Skullboard
+  - FacingWorlds
   - Abwarten
   - Anchor
   - Bakerman
-  - CasinoTown
   - CatMap
-  - Cloverland
   - CrestOfFlames
   - Crossroads
   - Downhill
-  - DreamWorld
-  - FacingWorlds
   - Freighter
-  - FSSmartFestival
-  - FSSmartMonsterHouse
-  1:
-  - FSSmartSilkRoad
-  - Geoglyph
   - GoodybagLair
   - Hampelmann
+  2:
   - Hell
+  - Hotel
   - InsideOut
+  - Kanto
   - Karo
   - KingOfTheHill
-  - LakeMountain
-  - LibraryOfTheAncients
-  - MaharataIslands
   - Metamorph
-  - MoonCity
-  - PhantomTrain
   - Playground
-  2:
   - Pollen
-  - PrimitiveEra
-  - Rabanastre
   - Schneggl
-  - SeabedShrine
-  - ShellIsland
   - ShellIsleRedux
-  - Skullboard
   - Spirograph
   - SuitsMap
-  - TheAmericas
   - ToadsHouse
   - VennDiagram
   - Vent
