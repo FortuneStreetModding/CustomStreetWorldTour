@@ -10,8 +10,10 @@
   - Gootrude
   - IS2Skyscraper
   - DreamWorld
+  - IS2Freeway
   - IS2UnderwaterMetropolis
   - CasinoTown
+  - IS2SophiesCave
   - Geoglyph
   - QueenBunny
   - PrimitiveEra
@@ -23,9 +25,9 @@
   - DSYoshisIsland
   - DSColossus
   - DSPeachsCastle
+  1:
   - DSDelfinoPlaza
   - DSRobbinHoodRuins
-  1:
   - DSAlefgard
   - FSSmartSilkRoad
   - FSSmartFestival
@@ -44,13 +46,16 @@
   - Anchor
   - Bakerman
   - CatMap
+  - CidsTower
   - CrestOfFlames
   - Crossroads
+  - DKsJungleAdventure
+  2:
   - Downhill
+  - IS2FreewayRemix
   - Freighter
   - GoodybagLair
   - Hampelmann
-  2:
   - Hell
   - Hotel
   - InsideOut
@@ -80,8 +85,10 @@
   - Gootrude
   - IS2Skyscraper
   - DreamWorld
+  - IS2Freeway
   - IS2UnderwaterMetropolis
   - CasinoTown
+  - IS2SophiesCave
   - Geoglyph
   - QueenBunny
   - PrimitiveEra
@@ -93,9 +100,9 @@
   - DSYoshisIsland
   - DSColossus
   - DSPeachsCastle
+  1:
   - DSDelfinoPlaza
   - DSRobbinHoodRuins
-  1:
   - DSAlefgard
   - FSSmartSilkRoad
   - FSSmartFestival
@@ -114,13 +121,16 @@
   - Anchor
   - Bakerman
   - CatMap
+  - CidsTower
   - CrestOfFlames
   - Crossroads
+  - DKsJungleAdventure
+  2:
   - Downhill
+  - IS2FreewayRemix
   - Freighter
   - GoodybagLair
   - Hampelmann
-  2:
   - Hell
   - Hotel
   - InsideOut
