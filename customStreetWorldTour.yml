@@ -1,5 +1,5 @@
 0:
-  practiceBoard: Karo
+  practiceBoard: ShellIsland
   0:
   - MaharataIslands
   - TheAmericas
@@ -14,6 +14,7 @@
   - IS2UnderwaterMetropolis
   - CasinoTown
   - IS2SophiesCave
+  1:
   - Geoglyph
   - QueenBunny
   - PrimitiveEra
@@ -25,10 +26,10 @@
   - DSYoshisIsland
   - DSColossus
   - DSPeachsCastle
-  1:
   - DSDelfinoPlaza
   - DSRobbinHoodRuins
   - DSAlefgard
+  2:
   - FSSmartSilkRoad
   - FSSmartFestival
   - MobileSchool
@@ -40,81 +41,9 @@
   - auMidnightTown
   - 30thDragonlordsCastle
   - 30thCrystalTower
-  - Skullboard
-  - FacingWorlds
-  - Abwarten
-  - Anchor
-  - Bakerman
-  - CatMap
-  - CidsTower
-  - CrestOfFlames
-  - Crossroads
-  - DKsJungleAdventure
-  2:
-  - Downhill
-  - IS2FreewayRemix
-  - Freighter
-  - GoodybagLair
-  - Hampelmann
-  - Hell
-  - Hotel
-  - InsideOut
-  - Kanto
-  - Karo
-  - KingOfTheHill
-  - Metamorph
-  - Playground
-  - Pollen
-  - Schneggl
-  - ShellIsleRedux
-  - Spirograph
-  - SuitsMap
-  - ToadsHouse
-  - VennDiagram
-  - Vent
-  - Vulvainseln
 1:
-  practiceBoard: Playground
+  practiceBoard: ShellIsleRedux
   0:
-  - MaharataIslands
-  - TheAmericas
-  - ShellIsland
-  - LakeMountain
-  - Cloverland
-  - MoonCity
-  - Gootrude
-  - IS2Skyscraper
-  - DreamWorld
-  - IS2Freeway
-  - IS2UnderwaterMetropolis
-  - CasinoTown
-  - IS2SophiesCave
-  - Geoglyph
-  - QueenBunny
-  - PrimitiveEra
-  - GKFLoatingContinent
-  - SeabedShrine
-  - Rabanastre
-  - LibraryOfTheAncients
-  - PhantomTrain
-  - DSYoshisIsland
-  - DSColossus
-  - DSPeachsCastle
-  1:
-  - DSDelfinoPlaza
-  - DSRobbinHoodRuins
-  - DSAlefgard
-  - FSSmartSilkRoad
-  - FSSmartFestival
-  - MobileSchool
-  - SmartAntarctica
-  - SmartZodiac
-  - SmartAquarium
-  - FSSmartMonsterHouse
-  - Bunnyland
-  - auMidnightTown
-  - 30thDragonlordsCastle
-  - 30thCrystalTower
   - Skullboard
   - FacingWorlds
   - Abwarten
@@ -125,10 +54,10 @@
   - CrestOfFlames
   - Crossroads
   - DKsJungleAdventure
-  2:
   - Downhill
   - IS2FreewayRemix
   - Freighter
+  1:
   - GoodybagLair
   - Hampelmann
   - Hell
@@ -143,8 +72,15 @@
   - Schneggl
   - ShellIsleRedux
   - Spirograph
+  2:
   - SuitsMap
   - ToadsHouse
   - VennDiagram
   - Vent
   - Vulvainseln
+  - EventSpiral
+  - EventSpiral
+  - EventSpiral
+  - EventSpiral
+  - EventSpiral
+  - EventSpiral
