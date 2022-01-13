@@ -178,7 +178,7 @@ def downloadBackgroundsAndMusic(yamlMaps : list[Path]):
 
 def createMapListFile(yamlMaps : list[Path], outputCsvFilePath : Path) -> int:
     mapsConfig = dict()
-    with open('customStreetWorldTour.yml', "r", encoding='utf8') as stream:
+    with open('customStreetWorldTour.yaml', "r", encoding='utf8') as stream:
         try:
             mapsConfig = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
