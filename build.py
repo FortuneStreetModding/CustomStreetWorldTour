@@ -16,6 +16,8 @@ import yaml
 import gdown
 import platform
 import tempfile
+import addressTranslator
+import struct
 
 EXECUTABLE_EXTENSION = ".exe" if platform.system() == "Windows" else ""
 DOWNLOAD_URL_CSMM = "https://api.github.com/repos/FortuneStreetModding/csmm-qt/releases/latest"
@@ -279,6 +281,46 @@ def patchLocalize(dir : str):
                 writer = csv.writer(csvfile)
                 writer.writerows(csvOutput.items())
 
+def applyHexEdits(mainDol : str):
+    # check if boom street or fortune street
+    with open(mainDol, "rb") as stream:
+        stream.seek(0x756b4)
+        b = stream.read(4)
+        v = struct.unpack(">I", b)[0]
+        print(hex(v))
+        if v == 0x800dab84:
+            boom = True
+        else:
+            boom = False
+
+    patchFiles = list(Path().glob('patches/*.yaml'))
+    patchLists = {}
+    for patchFile in patchFiles:
+        patch = dict()
+        with open(patchFile, "r", encoding='utf8') as stream:
+            try:
+                patch = yaml.safe_load(stream)
+                if "patches" in patch:
+                    patchLists[patchFile.name] = patch["patches"]
+            except yaml.YAMLError as exc:
+                print(exc)
+    with open(mainDol, "r+b") as stream:
+        for patchListFile in patchLists.keys():
+            patchList = patchLists[patchListFile]
+            print(f'Applying patch {patchListFile}...')
+            for patch in patchList:
+                boomAddress = int(patch["boomAddress"], 16)
+                format = patch["format"]
+                originalValue = patch["originalValue"]
+                patchValue = patch["patchValue"]
+                if boom:
+                    fileAddress = addressTranslator.bsvirt_to_bsfile.map(boomAddress)
+                else:
+                    fileAddress = addressTranslator.fsvirt_to_fsfile.map(addressTranslator.bsvirt_to_fsvirt.map(boomAddress))
+                stream.seek(fileAddress)
+                stream.write(struct.pack(format, patchValue))
+                print(f'  {hex(fileAddress)}: {originalValue} -> {patchValue}')
+
 def main(argv : list):
     csmm = findExecutable("csmm", downloadUrl=DOWNLOAD_URL_CSMM)
     if not csmm:
@@ -311,7 +353,7 @@ def main(argv : list):
     else:
         print(f'Extracting {str(file)} to {file.stem}...')
         check_output(f'{csmm} extract "{str(file)}" "{file.stem}"', encoding="utf-8")
-
+    
     print(f'Patching arc files...')
     patchArcs(file.stem, wszst, wimgt)
 
@@ -326,7 +368,10 @@ def main(argv : list):
 
     if 'error' in output.lower():
         sys.exit(1)
-    
+
+    print(f'Applying hex edits to main.dol...')
+    applyHexEdits(Path(Path(file.stem) / Path("sys/main.dol")))
+
     print(f'Packing {file.stem} to WBFS file...')
     print(check_output(f'{csmm} pack "{file.stem}" --force', encoding="utf-8"))
 
