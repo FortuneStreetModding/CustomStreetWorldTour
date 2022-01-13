@@ -1,6 +1,8 @@
 # ---------------------------------------------------------
-# ----------------- 3* Star Shop Price Change ------------
+# -------------- Three Star Shop Price Change -------------
 # ---------------------------------------------------------
+#
+# Reduces value and price of Three Star Shop from (1000,200) to (500,100)
 #
 # -------------- Things you may want to modify -----------------
 definitions: 
@@ -10,31 +12,31 @@ definitions:
 - &original_three_star_shop_value 1000
 - &original_three_star_shop_price 200
 patches:
-- boomAddress:   8008f192
+- boomAddress:   0x8008f192
   format:        ">h"
   originalValue: *original_three_star_shop_price
   patchValue:    *three_star_shop_price
-- boomAddress:   8008f18e
+- boomAddress:   0x8008f18e
   format:        ">h"
   originalValue: *original_three_star_shop_value
   patchValue:    *three_star_shop_value
-- boomAddress:   800ead3a
+- boomAddress:   0x800ead3a
   format:        ">h"
   originalValue: *original_three_star_shop_value
   patchValue:    *three_star_shop_value
-- boomAddress:   800fcae2
+- boomAddress:   0x800fcae2
   format:        ">h"
   originalValue: *original_three_star_shop_value
   patchValue:    *three_star_shop_value
-- boomAddress:   8015cf36
+- boomAddress:   0x8015cf36
   format:        ">h"
   originalValue: *original_three_star_shop_value
   patchValue:    *three_star_shop_value
-- boomAddress:   80160ee2
+- boomAddress:   0x80160ee2
   format:        ">h"
   originalValue: *original_three_star_shop_value
   patchValue:    *three_star_shop_value
-- boomAddress:   80411bb4
+- boomAddress:   0x80411bb4
   format:        ">I"
   originalValue: *original_three_star_shop_value
   patchValue:    *three_star_shop_value

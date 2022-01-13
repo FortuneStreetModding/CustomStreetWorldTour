@@ -1,0 +1,11 @@
+# ------------------------------------------------------
+# -------------- Tax Office Percentage -----------------
+# ------------------------------------------------------
+#
+# Reduces the tax price from 10% to 5%
+#
+patches:
+- boomAddress:   0x8008fa34
+  format:        ">I"
+  originalValue: 0x7C001670
+  patchValue:    0x7C001E70

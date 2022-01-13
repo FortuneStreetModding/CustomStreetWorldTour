@@ -1,2 +1,5 @@
 2881,"La valeur de la boutique grimpe de <price_diff><g> !<n>Les prix de la boutique grimpent de <fee_diff><g> !<n>Le capital max. est désormais de <zoushi_full><g>."
 2885,"La valeur de la boutique chute de <price_diff><g>.<n>Les prix de la boutique chutent de <fee_diff><g>.<n>Le capital max. est désormais de <zoushi_full><g>."
+3295,"Tu paies une taxe de 5% sur le total de tes biens."
+3305,"Tu achètes un cadeau pour 60<g> x le niveau du propriétaire = <bar><g>."
+3370,"Si l'hôtel des impôts ne t'appartient pas, tu dois payer un impôt de 5% du total de tes biens lorsque tu t'y arrêtes."

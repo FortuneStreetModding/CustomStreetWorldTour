@@ -1,0 +1,20 @@
+# ----------------------------------------------------
+# -------------- Price per Level at Home -------------
+# ----------------------------------------------------
+#
+# Increases the price per level at home from 30 to 60
+#
+# -------------- Things you may want to modify -----------------
+definitions: 
+ - &price_per_level 60
+# ----------- Things that should not be modified ----------------
+ - &original_price_per_level 30
+patches:
+- boomAddress:   0x8008fade
+  format:        ">h"
+  originalValue: *original_price_per_level
+  patchValue:    *price_per_level
+- boomAddress:   0x8010da32
+  format:        ">h"
+  originalValue: *original_price_per_level
+  patchValue:    *price_per_level

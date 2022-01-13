@@ -309,7 +309,7 @@ def applyHexEdits(mainDol : str):
             patchList = patchLists[patchListFile]
             print(f'Applying patch {patchListFile}...')
             for patch in patchList:
-                boomAddress = int(patch["boomAddress"], 16)
+                boomAddress = patch["boomAddress"]
                 format = patch["format"]
                 originalValue = patch["originalValue"]
                 patchValue = patch["patchValue"]
