@@ -51,17 +51,21 @@ def findExecutable(executable : str, downloadUrl : str = "", searchPath : Path =
     if searchPath:
         candidate = f'{str(searchPath.as_posix())}/{executable}{EXECUTABLE_EXTENSION}'
         try:
-            check_output(f'{candidate} --help', encoding="utf-8")
+            check_output([candidate, '--help'], encoding="utf-8")
             return candidate
         except OSError:
             pass
     candidates = list(Path().glob('**/' + executable + EXECUTABLE_EXTENSION))
+    if platform.system() == 'Darwin' and executable == 'csmm':
+        candidates.append('/Applications/csmm.app/Contents/MacOS/csmm')
     for candidate in candidates:
         try:
+            #print(candidate)
             candidate = str(candidate)
-            check_output(f'{candidate} --help', encoding="utf-8")
+            check_output([candidate, '--help'], encoding="utf-8")
             return candidate
-        except OSError:
+        except OSError as e:
+            #print(e)
             pass
     if downloadUrl:
         if 'github' in downloadUrl:
@@ -91,7 +95,7 @@ def download(path : str, url : str):
 
 def getValidCandidates(wit : str) -> list[FileTypeInfo]:
     validCandidates = []
-    output = check_output(f'{wit} filetype . --long --long --ignore-fst', encoding="utf-8")
+    output = check_output([wit, 'filetype', '.', '--long', '--long', '--ignore-fst'], encoding="utf-8")
     print(output)
     a,b,c = output.partition("---\n")
     candidates = filter(None, c.splitlines())
@@ -248,14 +252,14 @@ def patchArcs(dir : str, wszst : str, wimgt : str):
             arcsToBePatched[arcPathStr].append(pngPath)
     for arcToBePatched in arcsToBePatched:
         with tempfile.TemporaryDirectory() as tmpdirname:
-            print(check_output(f'{wszst} EXTRACT {arcToBePatched} --dest {tmpdirname} --overwrite', encoding="utf-8"))
+            print(check_output([wszst, 'EXTRACT', arcToBePatched, '--dest', tmpdirname, '--overwrite'], encoding="utf-8"))
             for pngPath in arcsToBePatched[arcToBePatched]:
                 pngPath = Path(pngPath)
                 basename_tpl_0 = Path(pngPath.stem)
                 basename_tpl = basename_tpl_0.with_suffix(".tpl")
                 tplPath = Path(tmpdirname) / Path(f'arc/timg/{basename_tpl}')
-                print(check_output(f'{wimgt} ENCODE {pngPath.as_posix()} --dest {tplPath.as_posix()} --overwrite', encoding="utf-8"))
-            print(check_output(f'{wszst} CREATE {tmpdirname} --dest {arcToBePatched} --overwrite', encoding="utf-8"))
+                print(check_output([wimgt, 'ENCODE', pngPath.as_posix(), '--dest', tplPath.as_posix(), '--overwrite'], encoding="utf-8"))
+            print(check_output([wszst, 'CREATE', tmpdirname, '--dest', arcToBePatched, '--overwrite'], encoding="utf-8"))
 
 def patchLocalize(dir : str):
     csvDeltas = list(Path().glob('files/localize/*.csv'))
@@ -327,7 +331,7 @@ def main(argv : list):
         print("Could not find csmm executable")
         sys.exit()
 
-    searchPath = Path(fetchLastLineOfString(check_output(f'{csmm} download-tools --force', encoding="utf-8")))
+    searchPath = Path(fetchLastLineOfString(check_output([csmm, 'download-tools', '--force'], encoding="utf-8")))
 
     wit = findExecutable("wit", searchPath=searchPath)
     if not wit:
@@ -352,7 +356,7 @@ def main(argv : list):
         print(f'Would extract {str(file)} to {file.stem} but it already exists. The directory is reused.')
     else:
         print(f'Extracting {str(file)} to {file.stem}...')
-        check_output(f'{csmm} extract "{str(file)}" "{file.stem}"', encoding="utf-8")
+        check_output([csmm, 'extract', str(file), file.stem], encoding="utf-8")
     
     print(f'Patching arc files...')
     patchArcs(file.stem, wszst, wimgt)
@@ -363,7 +367,7 @@ def main(argv : list):
     mapCount = createMapListFile(yamlMaps, Path(file.stem + '/csmm_pending_changes.csv'))
 
     print(f'Saving {str(mapCount)} maps to {file.stem}...')
-    output = check_output(f'{csmm} save "{file.stem}"', encoding="utf-8")
+    output = check_output([csmm, 'save', file.stem], encoding="utf-8")
     print(output)
 
     if 'error' in output.lower():
@@ -373,7 +377,7 @@ def main(argv : list):
     applyHexEdits(Path(Path(file.stem) / Path("sys/main.dol")))
 
     print(f'Packing {file.stem} to WBFS file...')
-    print(check_output(f'{csmm} pack "{file.stem}" --force', encoding="utf-8"))
+    print(check_output([csmm, 'pack', file.stem, '--force'], encoding="utf-8"))
 
 if __name__ == "__main__":
     main(sys.argv[1:])
