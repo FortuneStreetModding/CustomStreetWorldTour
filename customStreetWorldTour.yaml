@@ -1,6 +1,25 @@
 0:
   practiceBoard: ShellIsland
   0:
+  - CastleTrodain
+  - Observatory
+  - GhostShip
+  - Slimenia
+  - MtMagmageddon
+  - RobbinHoodRuins
+  - MarioStadium
+  - StarshipMario
+  - MarioCircuit
+  - YoshiIsland
+  - DelfinoPlaza
+  - PeachCastle
+  - Alefgard
+  - SuperMarioBros
+  - BowserCastle
+  - GoodEggGalaxy
+  - Colossus
+  - AlltradesAbbey
+  1:
   - MaharataIslands
   - TheAmericas
   - ShellIsland
@@ -14,12 +33,12 @@
   - IS2UnderwaterMetropolis
   - CasinoTown
   - IS2SophiesCave
-  1:
   - Geoglyph
   - QueenBunny
   - PrimitiveEra
   - GKFLoatingContinent
   - IS3CandyLand
+  2:
   - SeabedShrine
   - Rabanastre
   - LibraryOfTheAncients
@@ -30,7 +49,6 @@
   - DSDelfinoPlaza
   - DSRobbinHoodRuins
   - DSAlefgard
-  2:
   - FSSmartSilkRoad
   - FSSmartFestival
   - MobileSchool
@@ -45,8 +63,6 @@
 1:
   practiceBoard: ShellIsleRedux
   0:
-  - Skullboard
-  - FacingWorlds
   - Abwarten
   - Anchor
   - Bakerman
@@ -54,32 +70,52 @@
   - CidsTower
   - CrestOfFlames
   - Crossroads
+  - Karo
   - DKsJungleAdventure
+  - DelfinoRedux
   - Downhill
+  - FacingWorlds
   - IS2FreewayRemix
   - Freighter
-  1:
   - GoodybagLair
-  - Hampelmann
   - Hell
   - Hotel
   - InsideOut
-  - Kanto
-  - Karo
+  1:
+  - Hampelmann
   - KingOfTheHill
   - Metamorph
   - Playground
   - Pollen
-  - Schneggl
+  - QuietStreet
+  - Skullboard
   - ShellIsleRedux
+  - Schneggl
   - Spirograph
-  2:
   - SuitsMap
+  - Kanto
   - ToadsHouse
   - VennDiagram
   - Vent
   - Vulvainseln
   - WariosBattleCanyon
+  - EventSpiral
+  2:
+  - EventSpiral
+  - EventSpiral
+  - EventSpiral
+  - EventSpiral
+  - EventSpiral
+  - EventSpiral
+  - EventSpiral
+  - EventSpiral
+  - EventSpiral
+  - EventSpiral
+  - EventSpiral
+  - EventSpiral
+  - EventSpiral
+  - EventSpiral
+  - EventSpiral
   - EventSpiral
   - EventSpiral
   - EventSpiral
