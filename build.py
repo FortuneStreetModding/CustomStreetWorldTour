@@ -5,8 +5,12 @@ if sys.version_info < MIN_PYTHON:
     sys.exit("Python %s.%s or later is required.\n" % MIN_PYTHON)
 
 from subprocess import check_output
+from subprocess import CalledProcessError
 from pathlib import Path
 from dataclasses import dataclass
+from PIL import Image
+from PIL import ImageDraw
+from PIL import ImageFont
 
 import os
 import json
@@ -239,7 +243,15 @@ def resolveAll(path : Path, isLocalizeType : bool) -> list[Path]:
     paths.append(path)
     return paths
 
-def patchArcs(dir : str, wszst : str, wimgt : str):
+def drawVersionOnTitleImage(imageInputPath : Path, version : str, imageOutputPath : Path):
+    pattern = Image.open(imageInputPath, "r").convert('RGBA')
+    draw = ImageDraw.Draw(pattern,'RGBA')
+    font = ImageFont.truetype("DejaVuSans-Bold.ttf", 16)
+    draw.text((469,204), version, (22, 42, 136, 255) ,font=font, stroke_width=2, stroke_fill=(22, 42, 136, 255))
+    draw.text((469,204), version, (255, 255, 70, 255),font=font)
+    pattern.save(imageOutputPath)
+
+def patchArcs(dir : str, wszst : str, wimgt : str, version : str):
     pngPaths = list(Path().glob('files/**/*.png'))
     arcsToBePatched = {}
     for pngPath in pngPaths:
@@ -258,6 +270,11 @@ def patchArcs(dir : str, wszst : str, wimgt : str):
                 basename_tpl_0 = Path(pngPath.stem)
                 basename_tpl = basename_tpl_0.with_suffix(".tpl")
                 tplPath = Path(tmpdirname) / Path(f'arc/timg/{basename_tpl}')
+                # draw version onto the title screen image
+                if version and "ui_itasuto_logo_ja" in pngPath.name:
+                    newPngPath = Path(tmpdirname) / Path(pngPath.name)
+                    drawVersionOnTitleImage(pngPath, version, newPngPath)
+                    pngPath = newPngPath
                 print(check_output([wimgt, 'ENCODE', pngPath.as_posix(), '--dest', tplPath.as_posix(), '--overwrite'], encoding="utf-8"))
             print(check_output([wszst, 'CREATE', tmpdirname, '--dest', arcToBePatched, '--overwrite'], encoding="utf-8"))
 
@@ -358,8 +375,15 @@ def main(argv : list):
         print(f'Extracting {str(file)} to {file.stem}...')
         check_output([csmm, 'extract', str(file), file.stem], encoding="utf-8")
     
+    try:
+        version = check_output(f'git describe HEAD --always --tags', encoding="utf-8")
+        print(f'Using version {version}')
+    except CalledProcessError as err:
+        version = None
+        print(f'Unable to determine version: {err.output}')
+
     print(f'Patching arc files...')
-    patchArcs(file.stem, wszst, wimgt)
+    patchArcs(file.stem, wszst, wimgt, version)
 
     print(f'Patching localization files...')
     patchLocalize(file.stem)
