@@ -65,6 +65,7 @@
   practiceBoard: ShellIsleRedux
   0:
   - Abwarten
+  - AegisRim
   - Anchor
   - Bakerman
   - CatMap
@@ -81,11 +82,12 @@
   - GoodybagLair
   - Hell
   - Hotel
-  - InsideOut
   1:
+  - InsideOut
   - Hampelmann
   - KingOfTheHill
   - Metamorph
+  - NLA
   - Playground
   - Pollen
   - QuietStreet
@@ -99,11 +101,8 @@
   - VennDiagram
   - Vent
   - Vulvainseln
-  - WariosBattleCanyon
-  - NLA
   2:
-  - AegisRim
-  - EventSpiral
+  - WariosBattleCanyon
   - EventSpiral
   - EventSpiral
   - EventSpiral
