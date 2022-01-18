@@ -381,6 +381,9 @@ def main(argv : list):
     except CalledProcessError as err:
         version = None
         print(f'Unable to determine version: {err.output}')
+    except FileNotFoundError as err:
+        version = None
+        print(f'Unable to determine version: {err.output}')
 
     print(f'Patching arc files...')
     patchArcs(file.stem, wszst, wimgt, version)
