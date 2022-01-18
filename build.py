@@ -376,7 +376,7 @@ def main(argv : list):
         check_output([csmm, 'extract', str(file), file.stem], encoding="utf-8")
     
     try:
-        version = check_output(f'git describe HEAD --always --tags', encoding="utf-8")
+        version = check_output(['git', 'describe', 'HEAD', '--always', '--tags'], encoding="utf-8")
         print(f'Using version {version}')
     except CalledProcessError as err:
         version = None
