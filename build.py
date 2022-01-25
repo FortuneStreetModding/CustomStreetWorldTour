@@ -126,7 +126,7 @@ def fetchLastLineOfString(string : str):
     nonEmptyLines = list(filter(None, lines))
     return nonEmptyLines[-1]
 
-def getInputFortuneStreetFile(argv : list, wit : str) -> str:
+def getInputFortuneStreetFilePath(argv : list, wit : str) -> Path:
     if len(argv) < 1:
         validCandidates = getValidCandidates(wit, Path("."))
         if len(validCandidates) == 0:
@@ -386,7 +386,7 @@ def main(argv : list):
         version = None
         print(f'Unable to determine version: {err.strerror}')
 
-    file = getInputFortuneStreetFile(argv, wit)
+    file = getInputFortuneStreetFilePath(argv, wit)
 
     if(Path(file.stem).is_dir() and Path(file.stem).exists()):
         print(f'Would extract {str(file)} to {file.stem} but it already exists. The directory is reused.')
@@ -415,8 +415,9 @@ def main(argv : list):
     print(f'Applying hex edits to main.dol...')
     applyHexEdits(Path(Path(file.stem) / Path("sys/main.dol")))
 
-    print(f'Packing {file.stem} to WBFS file...')
-    print(check_output([csmm, 'pack', file.stem, '--force'], encoding="utf-8"))
+    outputFile = Path(file.parent) / Path("CustomStreetWorldTour.wbfs")
+    print(f'Packing {file.stem} to {outputFile}...')
+    print(check_output([csmm, 'pack', file.stem, outputFile.as_posix(), '--force'], encoding="utf-8"))
 
 if __name__ == "__main__":
     main(sys.argv[1:])
