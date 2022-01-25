@@ -59,6 +59,10 @@
   - FSSmartMonsterHouse
   - Bunnyland
   - auMidnightTown
+  - auShellIsleLite
+  - auCloverlandLite
+  - auGloriousSpecialty
+  - auNananasBuriedTreasure
   - 30thDragonlordsCastle
   - 30thCrystalTower
 1:
@@ -66,6 +70,7 @@
   0:
   - Abwarten
   - AegisRim
+  - AlchemistsHouse
   - Anchor
   - Bakerman
   - BaronStadium
@@ -81,8 +86,8 @@
   - Downhill
   - FacingWorlds
   - IS2FreewayRemix
-  - Freighter
   1:
+  - Freighter
   - GoodybagLair
   - Hell
   - HighRise
@@ -100,8 +105,8 @@
   - Playground
   - Pollen
   - QuietStreet
-  - RainbowDream
   2:
+  - RainbowDream
   - Skullboard
   - ShellIsleRedux
   - Schneggl
@@ -114,6 +119,9 @@
   - Vulvainseln
   - WariosBattleCanyon
   - Yoshi
+  - EventSpiral
+  - EventSpiral
+  - EventSpiral
   - EventSpiral
   - EventSpiral
   - EventSpiral
