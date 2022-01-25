@@ -22,6 +22,7 @@ import platform
 import tempfile
 import addressTranslator
 import struct
+import errno
 
 EXECUTABLE_EXTENSION = ".exe" if platform.system() == "Windows" else ""
 DOWNLOAD_URL_CSMM = "https://api.github.com/repos/FortuneStreetModding/csmm-qt/releases/latest"
@@ -212,6 +213,8 @@ def createMapListFile(yamlMaps : list[Path], outputCsvFilePath : Path) -> int:
                     if mapDir == practiceBoardName:
                         practiceBoard = 1
                     yamlFile = next((item for item in yamlMaps if item.parent.name == mapDir), None)
+                    if yamlFile == None:
+                        raise ValueError(f'No yaml file was found for the map {mapDir}')
                     yamlPath = '../fortunestreetmodding.github.io/_maps/' + mapDir + '/' + yamlFile.name
                     writer.writerow({'id': id, 'mapSet': mapSet, 'zone': zone, 'order': order, 'practiceBoard': practiceBoard, 'name': mapDir, 'yaml': yamlPath})
                     id += 1
