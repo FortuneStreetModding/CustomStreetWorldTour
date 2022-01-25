@@ -100,7 +100,13 @@ def download(path : str, url : str):
 
 def getValidCandidates(wit : str, path : Path) -> list[FileTypeInfo]:
     validCandidates = []
-    output = check_output([wit, 'filetype', path.as_posix(), '--long', '--long', '--ignore-fst'], encoding="utf-8")
+    try:
+        output = check_output([wit, 'filetype', path.as_posix(), '--long', '--long', '--ignore-fst'], encoding="utf-8")
+    except CalledProcessError as err:
+        if err.returncode == 8: # wit returns error code 8 if it doesnt find any wii images at all
+            return []
+        else:
+            raise err
     print(output)
     a,b,c = output.partition("---\n")
     candidates = filter(None, c.splitlines())
