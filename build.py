@@ -98,9 +98,15 @@ def download(path : str, url : str):
     gdown.extractall(zipFileDownload, path)
     os.remove(zipFileDownload)
 
-def getValidCandidates(wit : str) -> list[FileTypeInfo]:
+def getValidCandidates(wit : str, path : Path) -> list[FileTypeInfo]:
     validCandidates = []
-    output = check_output([wit, 'filetype', '.', '--long', '--long', '--ignore-fst'], encoding="utf-8")
+    try:
+        output = check_output([wit, 'filetype', path.as_posix(), '--long', '--long', '--ignore-fst'], encoding="utf-8")
+    except CalledProcessError as err:
+        if err.returncode == 8: # wit returns error code 8 if it doesnt find any wii images at all
+            return []
+        else:
+            raise err
     print(output)
     a,b,c = output.partition("---\n")
     candidates = filter(None, c.splitlines())
@@ -120,9 +126,11 @@ def fetchLastLineOfString(string : str):
     nonEmptyLines = list(filter(None, lines))
     return nonEmptyLines[-1]
 
-def getInputFortuneStreetFile(argv : list, wit : str) -> str:
+def getInputFortuneStreetFilePath(argv : list, wit : str) -> Path:
     if len(argv) < 1:
-        validCandidates = getValidCandidates(wit)
+        validCandidates = getValidCandidates(wit, Path("."))
+        if len(validCandidates) == 0:
+            validCandidates = getValidCandidates(wit, Path(".."))
         if len(validCandidates) == 0:
             print("Provide the path to the Fortune Street iso/wbfs file or put such a file into the same directory as this script")
             sys.exit()
@@ -368,16 +376,6 @@ def main(argv : list):
         print("Could not find wimgt executable")
         sys.exit()
 
-    yamlMaps = list(Path().glob('fortunestreetmodding.github.io/_maps/*/*.yaml'))
-    downloadBackgroundsAndMusic(yamlMaps)
-
-    file = getInputFortuneStreetFile(argv, wit)
-    if(Path(file.stem).is_dir() and Path(file.stem).exists()):
-        print(f'Would extract {str(file)} to {file.stem} but it already exists. The directory is reused.')
-    else:
-        print(f'Extracting {str(file)} to {file.stem}...')
-        check_output([csmm, 'extract', str(file), file.stem], encoding="utf-8")
-    
     try:
         version = check_output(['git', 'describe', 'HEAD', '--always', '--tags'], encoding="utf-8")
         print(f'Using version {version}')
@@ -386,7 +384,18 @@ def main(argv : list):
         print(f'Unable to determine version: {err.output}')
     except FileNotFoundError as err:
         version = None
-        print(f'Unable to determine version: {err.output}')
+        print(f'Unable to determine version: {err.strerror}')
+
+    file = getInputFortuneStreetFilePath(argv, wit)
+
+    if(Path(file.stem).is_dir() and Path(file.stem).exists()):
+        print(f'Would extract {str(file)} to {file.stem} but it already exists. The directory is reused.')
+    else:
+        print(f'Extracting {str(file)} to {file.stem}...')
+        check_output([csmm, 'extract', str(file), file.stem], encoding="utf-8")
+
+    yamlMaps = list(Path().glob('fortunestreetmodding.github.io/_maps/*/*.yaml'))
+    downloadBackgroundsAndMusic(yamlMaps)
 
     print(f'Patching arc files...')
     patchArcs(file.stem, wszst, wimgt, version)
@@ -406,8 +415,9 @@ def main(argv : list):
     print(f'Applying hex edits to main.dol...')
     applyHexEdits(Path(Path(file.stem) / Path("sys/main.dol")))
 
-    print(f'Packing {file.stem} to WBFS file...')
-    print(check_output([csmm, 'pack', file.stem, '--force'], encoding="utf-8"))
+    outputFile = Path(file.parent) / Path("CustomStreetWorldTour.wbfs")
+    print(f'Packing {file.stem} to {outputFile}...')
+    print(check_output([csmm, 'pack', file.stem, outputFile.as_posix(), '--force'], encoding="utf-8"))
 
 if __name__ == "__main__":
     main(sys.argv[1:])
