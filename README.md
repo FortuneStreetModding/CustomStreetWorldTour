@@ -4,8 +4,8 @@
 
 ## For end users (windows only right now)
 
-1. Download [setup.bat](Setup/setup.bat)
-2. Put the `setup.bat` and a vanilla Fortune Street iso/wbfs into a new empty directory
+1. Download [setup.bat](Setup/setup.bat) (on the page, right click 'Raw' and save linked content)
+2. Put the `setup.bat` and a vanilla Fortune Street or Boom Street iso/wbfs into a new empty directory
 3. Run the `setup.bat` to set up the needed tools automatically
 4. Run the `CustomStreetWorldTour/build.bat` to build Custom Street World Tour
 
