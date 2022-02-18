@@ -192,7 +192,7 @@ def downloadBackgroundsAndMusic(yamlMaps : list[Path]):
                             filesRequired.append(yamlContent['music'][musicType] + '.brstm')
                     # download is required if not all required files are available
                     downloadRequired = not all(item in filesAvailable for item in filesRequired)
-                    if 'download' in yamlContent['music'] and downloadRequired:
+                    if 'download' in yamlContent['music'] and yamlContent['music']['download'] and downloadRequired:
                         download(str(yamlMap.parent), yamlContent['music']['download'])
             except yaml.YAMLError as exc:
                 print(exc)
