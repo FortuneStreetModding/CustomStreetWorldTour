@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
+from pygit2 import GitError
 
 import os
 import json
@@ -23,6 +24,7 @@ import tempfile
 import addressTranslator
 import struct
 import errno
+import pygit2
 
 EXECUTABLE_EXTENSION = ".exe" if platform.system() == "Windows" else ""
 DOWNLOAD_URL_CSMM = "https://api.github.com/repos/FortuneStreetModding/csmm-qt/releases/latest"
@@ -377,14 +379,19 @@ def main(argv : list):
         sys.exit()
 
     try:
-        version = check_output(['git', 'describe', 'HEAD', '--always', '--tags'], encoding="utf-8")
+        repo = pygit2.Repository('.git')
+        head = repo.revparse_single('HEAD')
+        version = head.short_id
+        for ref in repo.references:
+            if ref.startswith("refs/tags/"):
+                commit = repo.revparse_single(ref)
+                if commit == head:
+                    version = ref.replace("refs/tags/", "")
+                    break
         print(f'Using version {version}')
-    except CalledProcessError as err:
+    except GitError as err:
         version = None
-        print(f'Unable to determine version: {err.output}')
-    except FileNotFoundError as err:
-        version = None
-        print(f'Unable to determine version: {err.strerror}')
+        print(f'Unable to determine version: {err.args[0]}')
 
     file = getInputFortuneStreetFilePath(argv, wit)
 
