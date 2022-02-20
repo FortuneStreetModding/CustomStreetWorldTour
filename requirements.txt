@@ -1,4 +1,4 @@
-gdown>=4.3.0
+gdown>=4.3.1
 pyyaml
 pillow
 pygit2
