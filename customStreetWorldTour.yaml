@@ -96,7 +96,6 @@
   - Anchor
   - Bakerman
   - CastleLise
-  - CastleTown
   - CatMap
   - CidsTower
   - Creeper
@@ -108,8 +107,8 @@
   - Downhill
   - DungeonLobby
   - FacingWorlds
-  1:
   - IS2FreewayRemix
+  1:
   - Freighter
   - GoodybagLair
   - Hell
@@ -127,8 +126,8 @@
   - Palamecia
   - PlanetMira
   - Playground
-  2:
   - Pollen
+  2:
   - QuietStreet
   - RainbowDream
   - Skullboard
@@ -144,6 +143,7 @@
   - Vulvainseln
   - WariosBattleCanyon
   - Yoshi
+  - EventSpiral
   - EventSpiral
   - EventSpiral
   - EventSpiral
