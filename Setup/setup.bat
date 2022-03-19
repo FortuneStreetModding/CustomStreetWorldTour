@@ -35,7 +35,7 @@ IF ERRORLEVEL 1 (
     )
     ECHO Python installed successfully
 )
-git clone --depth=1 --shallow-submodules --recurse-submodules="fortunestreetmodding.github.io" https://github.com/FortuneStreetModding/CustomStreetWorldTour.git --branch master
+git clone --depth=1 --shallow-submodules --recurse-submodules="fortunestreetmodding.github.io" https://github.com/FortuneStreetModding/CustomStreetWorldTour.git --branch s3-test-branch
 python -m pip install --requirement CustomStreetWorldTour/requirements.txt --user
 IF ERRORLEVEL 0 (
     ECHO Setup finished and ready to build!
