@@ -11,5 +11,5 @@ fi
 if [ "$bad" -eq 1 ]; then
 exit 1
 fi
-git clone --depth=1 --shallow-submodules --recurse-submodules="fortunestreetmodding.github.io" https://github.com/FortuneStreetModding/CustomStreetWorldTour.git --branch master
+git clone --depth=1 --shallow-submodules --recurse-submodules="fortunestreetmodding.github.io" https://github.com/FortuneStreetModding/CustomStreetWorldTour.git --branch s3-test-branch
 python3 -m pip install --requirement CustomStreetWorldTour/requirements.txt --user
