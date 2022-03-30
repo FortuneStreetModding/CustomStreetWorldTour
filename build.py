@@ -12,7 +12,9 @@ from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
 from pygit2 import GitError
+from multiprocessing import Pool
 
+import functools
 import os
 import json
 import urllib.request
@@ -25,6 +27,9 @@ import addressTranslator
 import struct
 import errno
 import pygit2
+import logging
+
+logger = logging.Logger('catch_all')
 
 EXECUTABLE_EXTENSION = ".exe" if platform.system() == "Windows" else ""
 DOWNLOAD_URL_CSMM = "https://api.github.com/repos/FortuneStreetModding/csmm-qt/releases/latest"
@@ -89,16 +94,30 @@ def findExecutable(executable : str, downloadUrl : str = "", searchPath : Path =
                 print(f'failed downloading {executable}: {str(err)}')
     return ""
 
-def download(path : str, url : str):
-    print(f'downloading {url}...')
+def download(path : str, mirrors):
+    if type(mirrors) == str:
+        url = mirrors
+    elif len(mirrors) == 1:
+        url = mirrors[0]
+    else:
+        for mirror in mirrors:
+            try:
+                if download(path, mirror):
+                    return
+            except Exception as e:
+                logger.error(e, exc_info=True)
+        return
+    print(f'{Path(path).name}: Downloading {url}...')
     if 'drive.google.com' in url:
-        zipFileDownload = gdown.download(url, quiet=False)
+        zipFileDownload = gdown.download(url, quiet=True)
     else:
         lastUrlPart = url.rsplit('/', 1)[-1]
         zipFileDownload = urllib.request.urlretrieve(url, lastUrlPart)[0]
-    print(f'extracting {zipFileDownload} to {path}...')
+    print(f'{Path(path).name}: Extracting {zipFileDownload}...')
     gdown.extractall(zipFileDownload, path)
     os.remove(zipFileDownload)
+    print(f'{Path(path).name}: Complete!')
+    return True
 
 def getValidCandidates(wit : str, path : Path) -> list[FileTypeInfo]:
     validCandidates = []
