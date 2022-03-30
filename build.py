@@ -169,6 +169,52 @@ def getInputFortuneStreetFilePath(argv : list, wit : str) -> Path:
             sys.exit()
         return file
 
+def downloadBackgroundAndMusic(yamlMap : Path, backgrounds : dict):
+    with open(yamlMap, "r", encoding='utf8') as stream:
+        try:
+            yamlContent = yaml.safe_load(stream)
+            downloadedSomething = False
+            if 'background' in yamlContent:
+                # find the background in the backgrounds.yml
+                background = yamlContent['background']
+                definedBackground = next((item for item in backgrounds if item["background"] == background), None)
+                if definedBackground:
+                    if 'download' in definedBackground:
+                        # check if all files are available
+                        filesAvailable = list(Path().glob(str(yamlMap.parent) + '/*.*'))
+                        filesAvailable = list(map(lambda x: x.name, filesAvailable))
+                        filesRequired = list()
+                        filesRequired.append(background + '.cmpres')
+                        filesRequired.append(background + '.scene')
+                        if 'music' in definedBackground:
+                            for musicType in definedBackground['music']:
+                                if musicType != 'download' and definedBackground['music'][musicType]:
+                                    filesRequired.append(definedBackground['music'][musicType] + '.brstm')
+                        # download is required if not all required files are available
+                        downloadRequired = not all(item in filesAvailable for item in filesRequired)
+                        if downloadRequired:
+                            download(str(yamlMap.parent), definedBackground['download'])
+                            downloadedSomething = True
+            if 'music' in yamlContent:
+                # check if all brstm files are available
+                filesAvailable = list(Path().glob(str(yamlMap.parent) + '/*.brstm'))
+                filesAvailable = list(map(lambda x: x.name, filesAvailable))
+                filesRequired = list()
+                for musicType in yamlContent['music']:
+                    if musicType != 'download' and yamlContent['music'][musicType]:
+                        filesRequired.append(yamlContent['music'][musicType] + '.brstm')
+                # download is required if not all required files are available
+                downloadRequired = not all(item in filesAvailable for item in filesRequired)
+                if 'download' in yamlContent['music'] and yamlContent['music']['download'] and downloadRequired:
+                    download(str(yamlMap.parent), yamlContent['music']['download'])
+                    downloadedSomething = True
+            if downloadedSomething:
+                print(f'Download for {yamlMap.parent.name} complete')
+            else:
+                print(f'Nothing to download for {yamlMap.parent.name}')
+        except yaml.YAMLError as exc:
+            print(exc)
+
 def downloadBackgroundsAndMusic(yamlMaps : list[Path]):
     backgrounds = dict()
     with open('fortunestreetmodding.github.io/_data/backgrounds.yml', "r", encoding='utf8') as stream:
@@ -176,45 +222,8 @@ def downloadBackgroundsAndMusic(yamlMaps : list[Path]):
             backgrounds = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
             print(exc)
-    for yamlMap in yamlMaps:
-        print(f'Scanning {yamlMap.parent.name}')
-        with open(yamlMap, "r", encoding='utf8') as stream:
-            try:
-                yamlContent = yaml.safe_load(stream)
-                if 'background' in yamlContent:
-                    # find the background in the backgrounds.yml
-                    background = yamlContent['background']
-                    definedBackground = next((item for item in backgrounds if item["background"] == background), None)
-                    if definedBackground:
-                        if 'download' in definedBackground:
-                            # check if all files are available
-                            filesAvailable = list(Path().glob(str(yamlMap.parent) + '/*.*'))
-                            filesAvailable = list(map(lambda x: x.name, filesAvailable))
-                            filesRequired = list()
-                            filesRequired.append(background + '.cmpres')
-                            filesRequired.append(background + '.scene')
-                            if 'music' in definedBackground:
-                                for musicType in definedBackground['music']:
-                                    if musicType != 'download' and definedBackground['music'][musicType]:
-                                        filesRequired.append(definedBackground['music'][musicType] + '.brstm')
-                            # download is required if not all required files are available
-                            downloadRequired = not all(item in filesAvailable for item in filesRequired)
-                            if downloadRequired:
-                                download(str(yamlMap.parent), definedBackground['download'])
-                if 'music' in yamlContent:
-                    # check if all brstm files are available
-                    filesAvailable = list(Path().glob(str(yamlMap.parent) + '/*.brstm'))
-                    filesAvailable = list(map(lambda x: x.name, filesAvailable))
-                    filesRequired = list()
-                    for musicType in yamlContent['music']:
-                        if musicType != 'download' and yamlContent['music'][musicType]:
-                            filesRequired.append(yamlContent['music'][musicType] + '.brstm')
-                    # download is required if not all required files are available
-                    downloadRequired = not all(item in filesAvailable for item in filesRequired)
-                    if 'download' in yamlContent['music'] and yamlContent['music']['download'] and downloadRequired:
-                        download(str(yamlMap.parent), yamlContent['music']['download'])
-            except yaml.YAMLError as exc:
-                print(exc)
+    with Pool(8) as p:
+        p.map(functools.partial(downloadBackgroundAndMusic, backgrounds=backgrounds), yamlMaps)
 
 def createMapListFile(yamlMaps : list[Path], outputCsvFilePath : Path) -> int:
     mapsConfig = dict()
