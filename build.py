@@ -111,22 +111,22 @@ def download(path : str, mirrors, label : str, print_failure : bool = True):
             except Exception as e:
                 logger.error(e, exc_info=True)
         if print_failure:
-            cprint(f'{label}: Failed!', 'red')
+            cprint(f'{label:30} Failed!', 'red')
         return False
-    print(f'{label}: Downloading {url}...')
+    print(f'{label:30} Downloading {url}...')
     if 'drive.google.com' in url:
         zipFileDownload = gdown.download(url, quiet=True)
         if zipFileDownload == None:
             if print_failure:
-                cprint(f'{label}: Failed!', 'red')
+                cprint(f'{label:30}: Failed!', 'red')
             return False
     else:
         lastUrlPart = url.rsplit('/', 1)[-1]
         zipFileDownload = urllib.request.urlretrieve(url, lastUrlPart)[0]
-    print(f'{label}: Extracting {zipFileDownload}...')
+    print(f'{label:30} Extracting {zipFileDownload}...')
     gdown.extractall(zipFileDownload, path)
     os.remove(zipFileDownload)
-    cprint(f'{label}: Complete!', 'green')
+    cprint(f'{label:30} Complete!', 'green')
     return True
 
 def getValidCandidates(wit : str, path : Path) -> list[FileTypeInfo]:
@@ -203,7 +203,7 @@ def downloadBackgroundAndMusic(yamlMap : Path, backgrounds : dict):
                         # download is required if not all required files are available
                         downloadRequired = not all(item in filesAvailable for item in filesRequired)
                         if downloadRequired:
-                            download(str(yamlMap.parent), definedBackground['download'], f'{str(yamlMap.parent.name)} Background')
+                            download(str(yamlMap.parent), definedBackground['download'], f'{str(yamlMap.parent.name)} bg')
                             downloadedSomething = True
             if 'music' in yamlContent:
                 # check if all brstm files are available
@@ -216,7 +216,7 @@ def downloadBackgroundAndMusic(yamlMap : Path, backgrounds : dict):
                 # download is required if not all required files are available
                 downloadRequired = not all(item in filesAvailable for item in filesRequired)
                 if 'download' in yamlContent['music'] and yamlContent['music']['download'] and downloadRequired:
-                    download(str(yamlMap.parent), yamlContent['music']['download'], f'{str(yamlMap.parent.name)} Music')
+                    download(str(yamlMap.parent), yamlContent['music']['download'], f'{str(yamlMap.parent.name)} music')
                     downloadedSomething = True
             if not downloadedSomething:
                 print(f'Nothing to download for {yamlMap.parent.name}')
@@ -462,7 +462,17 @@ def main(argv : list):
 
     outputFile = Path(file.parent) / Path("CustomStreetWorldTour.wbfs")
     print(f'Packing {file.stem} to {outputFile}...')
-    print(check_output([csmm, 'pack', file.stem, outputFile.as_posix(), '--force'], encoding="utf-8"))
+    msg = check_output([csmm, 'pack', file.stem, outputFile.as_posix(), '--force'], encoding="utf-8")
+    print(msg)
+
+    # dirty hack to check if the packing has been successful
+    nlines = len(msg.strip().splitlines())
+    if msg.startswith('Creating') and nlines == 1 or msg.startswith('Overwriting') and nlines == 2:
+        msg = f'{outputFile.as_posix()} version {version} has been built sucessfully!'
+        count = len(msg)+4
+        cprint(count*'*', 'green')
+        cprint(f'* {msg} *', 'green')
+        cprint(count*'*', 'green')
 
 if __name__ == "__main__":
     main(sys.argv[1:])
