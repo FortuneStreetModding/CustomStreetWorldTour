@@ -13,6 +13,7 @@ from PIL import ImageDraw
 from PIL import ImageFont
 from pygit2 import GitError
 from multiprocessing import Pool
+from termcolor import cprint
 
 import functools
 import os
@@ -25,9 +26,10 @@ import platform
 import tempfile
 import addressTranslator
 import struct
-import errno
 import pygit2
 import logging
+import colorama
+
 
 logger = logging.Logger('catch_all')
 
@@ -94,7 +96,9 @@ def findExecutable(executable : str, downloadUrl : str = "", searchPath : Path =
                 print(f'failed downloading {executable}: {str(err)}')
     return ""
 
-def download(path : str, mirrors):
+def download(path : str, mirrors, label : str, print_failure : bool = True):
+    if label == None:
+        label = Path(path).name
     if type(mirrors) == str:
         url = mirrors
     elif len(mirrors) == 1:
@@ -102,21 +106,27 @@ def download(path : str, mirrors):
     else:
         for mirror in mirrors:
             try:
-                if download(path, mirror):
-                    return
+                if download(path, mirror, label, False):
+                    return True
             except Exception as e:
                 logger.error(e, exc_info=True)
-        return
-    print(f'{Path(path).name}: Downloading {url}...')
+        if print_failure:
+            cprint(f'{label}: Failed!', 'red')
+        return False
+    print(f'{label}: Downloading {url}...')
     if 'drive.google.com' in url:
         zipFileDownload = gdown.download(url, quiet=True)
+        if zipFileDownload == None:
+            if print_failure:
+                cprint(f'{label}: Failed!', 'red')
+            return False
     else:
         lastUrlPart = url.rsplit('/', 1)[-1]
         zipFileDownload = urllib.request.urlretrieve(url, lastUrlPart)[0]
-    print(f'{Path(path).name}: Extracting {zipFileDownload}...')
+    print(f'{label}: Extracting {zipFileDownload}...')
     gdown.extractall(zipFileDownload, path)
     os.remove(zipFileDownload)
-    print(f'{Path(path).name}: Complete!')
+    cprint(f'{label}: Complete!', 'green')
     return True
 
 def getValidCandidates(wit : str, path : Path) -> list[FileTypeInfo]:
@@ -193,7 +203,7 @@ def downloadBackgroundAndMusic(yamlMap : Path, backgrounds : dict):
                         # download is required if not all required files are available
                         downloadRequired = not all(item in filesAvailable for item in filesRequired)
                         if downloadRequired:
-                            download(str(yamlMap.parent), definedBackground['download'])
+                            download(str(yamlMap.parent), definedBackground['download'], f'{str(yamlMap.parent.name)} Background')
                             downloadedSomething = True
             if 'music' in yamlContent:
                 # check if all brstm files are available
@@ -206,11 +216,9 @@ def downloadBackgroundAndMusic(yamlMap : Path, backgrounds : dict):
                 # download is required if not all required files are available
                 downloadRequired = not all(item in filesAvailable for item in filesRequired)
                 if 'download' in yamlContent['music'] and yamlContent['music']['download'] and downloadRequired:
-                    download(str(yamlMap.parent), yamlContent['music']['download'])
+                    download(str(yamlMap.parent), yamlContent['music']['download'], f'{str(yamlMap.parent.name)} Music')
                     downloadedSomething = True
-            if downloadedSomething:
-                print(f'Download for {yamlMap.parent.name} complete')
-            else:
+            if not downloadedSomething:
                 print(f'Nothing to download for {yamlMap.parent.name}')
         except yaml.YAMLError as exc:
             print(exc)
@@ -222,7 +230,7 @@ def downloadBackgroundsAndMusic(yamlMaps : list[Path]):
             backgrounds = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
             print(exc)
-    with Pool(8) as p:
+    with Pool(4) as p:
         p.map(functools.partial(downloadBackgroundAndMusic, backgrounds=backgrounds), yamlMaps)
 
 def createMapListFile(yamlMaps : list[Path], outputCsvFilePath : Path) -> int:
@@ -384,6 +392,8 @@ def applyHexEdits(mainDol : str):
                 print(f'  {hex(fileAddress)}: {originalValue} -> {patchValue}')
 
 def main(argv : list):
+    colorama.init()
+
     csmm = findExecutable("csmm", downloadUrl=DOWNLOAD_URL_CSMM)
     if not csmm:
         print("Could not find csmm executable")

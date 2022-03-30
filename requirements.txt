@@ -2,3 +2,5 @@ gdown>=4.3.1
 pyyaml
 pillow
 pygit2
+colorama
+termcolor
