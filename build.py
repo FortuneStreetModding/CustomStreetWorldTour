@@ -388,7 +388,10 @@ def applyHexEdits(mainDol : str):
                 else:
                     fileAddress = addressTranslator.fsvirt_to_fsfile.map(addressTranslator.bsvirt_to_fsvirt.map(boomAddress))
                 stream.seek(fileAddress)
-                stream.write(struct.pack(format, patchValue))
+                if format=='hex':
+                    stream.write(bytes.fromhex(patchValue))
+                else:
+                    stream.write(struct.pack(format, patchValue))
                 print(f'  {hex(fileAddress)}: {originalValue} -> {patchValue}')
 
 def main(argv : list):
