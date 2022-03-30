@@ -454,7 +454,7 @@ def main(argv : list):
     mapCount = createMapListFile(yamlMaps, Path(file.stem + '/csmm_pending_changes.csv'))
 
     print(f'Saving {str(mapCount)} maps to {file.stem}...')
-    output = check_output([csmm, 'save', file.stem], encoding="utf-8")
+    output = check_output([csmm, 'save', '--addAuthorToDescription', '1', file.stem], encoding="utf-8")
     print(output)
 
     if 'error' in output.lower():
