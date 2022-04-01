@@ -16,7 +16,7 @@
   - During installation of python make sure to check the checkbox "Add Python to PATH"
 - You need to have copy of Fortune Street or Boom Street (.iso or .wbfs). This file needs to be in the same directory as this script. Also make sure there is only one original iso/wbfs in this directory.
 
-### Getting Started
+#### Getting Started
 
 1. Clone this repository using git. Do not forget to clone submodules as well.
 2. Install the needed python packages using `python -m pip install --requirement requirements.txt`
