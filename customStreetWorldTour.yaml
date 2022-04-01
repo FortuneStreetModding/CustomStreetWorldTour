@@ -91,6 +91,7 @@
   practiceBoard: ShellIsleRedux
   0:
   - Abwarten
+  - AcademyCity
   - AegisRim
   - AlchemistsHouse
   - Anchor
@@ -107,8 +108,8 @@
   - DKsJungleAdventure
   - Downhill
   - DungeonLobby
-  - FacingWorlds
   1:
+  - FacingWorlds
   - IS2FreewayRemix
   - Freighter
   - GoodybagLair
@@ -126,8 +127,8 @@
   - NLA
   - Palamecia
   - PlanetMira
-  - Playground
   2:
+  - Playground
   - Pollen
   - QuietStreet
   - RainbowDream
@@ -146,7 +147,6 @@
   - Vulvainseln
   - WariosBattleCanyon
   - Yoshi
-  - EventSpiral
   - EventSpiral
   - EventSpiral
   - EventSpiral
