@@ -1,0 +1,16 @@
+# ---------------------------------------------------------
+# ------------ Unlock all Boards by default ---------------
+# ---------------------------------------------------------
+#
+# Unlocks all boards by default
+#
+patches:
+- boomAddress:   0x8020f8d8
+  format:        hex
+  originalValue: 80 20 f8 fc
+  patchValue:    38 60 00 01
+- boomAddress:   0x8020f91c
+  format:        hex
+  originalValue: 38 60 00 00
+  patchValue:    38 60 00 01
+

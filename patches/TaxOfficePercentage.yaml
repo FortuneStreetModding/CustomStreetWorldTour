@@ -6,6 +6,6 @@
 #
 patches:
 - boomAddress:   0x8008fa34
-  format:        ">I"
-  originalValue: 0x7C001670
-  patchValue:    0x7C001E70
+  format:        hex
+  originalValue: 7C 00 16 70
+  patchValue:    7C 00 1E 70
