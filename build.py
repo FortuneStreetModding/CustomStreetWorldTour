@@ -29,7 +29,8 @@ import struct
 import pygit2
 import logging
 import colorama
-
+import requests
+import configparser
 
 logger = logging.Logger('catch_all')
 
@@ -89,16 +90,20 @@ def findExecutable(executable : str, downloadUrl : str = "", searchPath : Path =
             except Exception as err:
                 print(f'failed downloading {executable}: {str(err)}')
         else:
-            try:
-                download(".", downloadUrl)
-                return findExecutable(executable)
-            except Exception as err:
-                print(f'failed downloading {executable}: {str(err)}')
+            raise NotImplementedError
     return ""
 
-def download(path : str, mirrors, label : str, print_failure : bool = True):
-    if label == None:
-        label = Path(path).name
+def config_update_file_size(config : configparser.ConfigParser, section : str, file_size : int):
+    config[section] = {'file.size': file_size}
+
+def check_update_available(config : configparser.ConfigParser, section : str, mirrors):
+    file_size = config.getint(section, 'file.size', fallback=-1)
+    server_file_size = get_filesize(mirrors)
+    if server_file_size == -1 or file_size != server_file_size:
+        return True
+    return False
+
+def get_filesize(mirrors):
     if type(mirrors) == str:
         url = mirrors
     elif len(mirrors) == 1:
@@ -106,14 +111,59 @@ def download(path : str, mirrors, label : str, print_failure : bool = True):
     else:
         for mirror in mirrors:
             try:
-                if download(path, mirror, label, False):
-                    return True
+                file_size = get_filesize(mirror)
+                if file_size != -1:
+                    return file_size
             except Exception as e:
                 logger.error(e, exc_info=True)
+        return -1
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36"  # NOQA
+    }
+    try:
+        sess = requests.session()
+        size = -1
+        if 'drive.google.com' in url:
+            headers["Accept"] = "application/json"
+            fileId = url.split("id=")[1].split("&")[0]
+            res = sess.get(f'https://www.googleapis.com/drive/v3/files/{fileId}?alt=json&fields=size&key=AIzaSyDQB22BQtznFe85nOyok2U9qO5HSr3Z5u4')
+            data = res.json()
+            if 'error' in data:
+                cprint('google drive error', 'red')
+                if 'message' in data['error']:
+                    print(data['error']['message'])
+            else:
+                size = int(data["size"])
+        else:
+            res = sess.head(url, headers=headers, stream=True, verify=True, allow_redirects=True)
+            size = int(res.headers.get("Content-Length", 0))
+        return size
+    except IOError as e:
+        print(e, file=sys.stderr)
+        return -1
+    finally:
+        sess.close()
+
+def download(path : str, mirrors, label : str, config : configparser.ConfigParser, config_section : str, update : bool, print_failure : bool = True):
+    if type(mirrors) == str:
+        url = mirrors
+    elif len(mirrors) == 1:
+        url = mirrors[0]
+    else:
+        for mirror in mirrors:
+            try:
+                if download(path, mirror, label, config, config_section, update, False):
+                    return True
+            except urllib.error.URLError as e:
+                cprint(f'{label:30} Download error: {str(e.reason)}', 'yellow')
         if print_failure:
             cprint(f'{label:30} Failed!', 'red')
         return False
-    print(f'{label:30} Downloading {url}...')
+    if update:
+        print(f'{label:30} Updating {url}...')
+    else:
+        print(f'{label:30} Downloading {url}...')
     if 'drive.google.com' in url:
         zipFileDownload = gdown.download(url, quiet=True)
         if zipFileDownload == None:
@@ -125,8 +175,15 @@ def download(path : str, mirrors, label : str, print_failure : bool = True):
         zipFileDownload = urllib.request.urlretrieve(url, lastUrlPart)[0]
     print(f'{label:30} Extracting {zipFileDownload}...')
     gdown.extractall(zipFileDownload, path)
+    # remember the filesize
+    file_size = os.path.getsize(zipFileDownload)
+    config_update_file_size(config, config_section, file_size)
+    # remove the zip file
     os.remove(zipFileDownload)
-    cprint(f'{label:30} Complete!', 'green')
+    if update:
+        cprint(f'{label:30} Update Complete!', 'green')
+    else:
+        cprint(f'{label:30} Download Complete!', 'green')
     return True
 
 def getValidCandidates(wit : str, path : Path) -> list[FileTypeInfo]:
@@ -184,28 +241,43 @@ def downloadBackgroundAndMusic(yamlMap : Path, backgrounds : dict):
         try:
             yamlContent = yaml.safe_load(stream)
             downloadedSomething = False
+
+            configpath = Path(yamlMap.parent) / Path(f'{str(yamlMap.parent.name)}.cfg')
+            config = configparser.ConfigParser()
+            if configpath.exists() and configpath.is_file():
+                config.read(configpath)
+
             if 'background' in yamlContent:
                 # find the background in the backgrounds.yml
                 background = yamlContent['background']
                 definedBackground = next((item for item in backgrounds if item["background"] == background), None)
-                if definedBackground:
-                    if 'download' in definedBackground:
-                        # check if all files are available
-                        filesAvailable = list(Path().glob(str(yamlMap.parent) + '/*.*'))
-                        filesAvailable = list(map(lambda x: x.name, filesAvailable))
-                        filesRequired = list()
-                        filesRequired.append(background + '.cmpres')
-                        filesRequired.append(background + '.scene')
-                        if 'music' in definedBackground:
-                            for musicType in definedBackground['music']:
-                                if musicType != 'download' and definedBackground['music'][musicType]:
-                                    filesRequired.append(definedBackground['music'][musicType] + '.brstm')
-                        # download is required if not all required files are available
-                        downloadRequired = not all(item in filesAvailable for item in filesRequired)
-                        if downloadRequired:
-                            download(str(yamlMap.parent), definedBackground['download'], f'{str(yamlMap.parent.name)} bg')
-                            downloadedSomething = True
-            if 'music' in yamlContent:
+                if definedBackground and 'download' in definedBackground and definedBackground['download']:
+                    # check if all files are available
+                    filesAvailable = list(Path().glob(str(yamlMap.parent) + '/*.*'))
+                    filesAvailable = list(map(lambda x: x.name, filesAvailable))
+                    filesRequired = list()
+                    filesRequired.append(background + '.cmpres')
+                    filesRequired.append(background + '.scene')
+                    if 'music' in definedBackground:
+                        for musicType in definedBackground['music']:
+                            if musicType != 'download' and definedBackground['music'][musicType]:
+                                filesRequired.append(definedBackground['music'][musicType] + '.brstm')
+                    # download is required if not all required files are available
+                    downloadRequired = not all(item in filesAvailable for item in filesRequired)
+                    
+                    mirrors = definedBackground['download']
+                    config_section = "background"
+                    label = f'{yamlMap.parent.name}_bg'
+                    # download is also required when the filesize does not match the server
+                    update = False
+                    if not downloadRequired:
+                        update = check_update_available(config, config_section, mirrors)
+                        if update:
+                            downloadRequired = True
+                    if downloadRequired:
+                        download(str(yamlMap.parent), mirrors, label, config, config_section, update)
+                        downloadedSomething = True
+            if 'music' in yamlContent and 'download' in yamlContent['music'] and yamlContent['music']['download']:
                 # check if all brstm files are available
                 filesAvailable = list(Path().glob(str(yamlMap.parent) + '/*.brstm'))
                 filesAvailable = list(map(lambda x: x.name, filesAvailable))
@@ -215,10 +287,23 @@ def downloadBackgroundAndMusic(yamlMap : Path, backgrounds : dict):
                         filesRequired.append(yamlContent['music'][musicType] + '.brstm')
                 # download is required if not all required files are available
                 downloadRequired = not all(item in filesAvailable for item in filesRequired)
-                if 'download' in yamlContent['music'] and yamlContent['music']['download'] and downloadRequired:
-                    download(str(yamlMap.parent), yamlContent['music']['download'], f'{str(yamlMap.parent.name)} music')
+                    
+                mirrors = yamlContent['music']['download']
+                config_section = "music"
+                label = f'{yamlMap.parent.name}_music'
+                # download is also required when the filesize does not match the server
+                update = False
+                if not downloadRequired:
+                    update = check_update_available(config, config_section, mirrors)
+                    if update:
+                        downloadRequired = True
+                if downloadRequired:
+                    download(str(yamlMap.parent), mirrors, label, config, config_section, update)
                     downloadedSomething = True
-            if not downloadedSomething:
+            if downloadedSomething:
+                with open(configpath, 'w') as configfile:
+                    config.write(configfile)
+            else:
                 print(f'Nothing to download for {yamlMap.parent.name}')
         except yaml.YAMLError as exc:
             print(exc)
@@ -230,8 +315,13 @@ def downloadBackgroundsAndMusic(yamlMaps : list[Path]):
             backgrounds = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
             print(exc)
-    with Pool(4) as p:
-        p.map(functools.partial(downloadBackgroundAndMusic, backgrounds=backgrounds), yamlMaps)
+    threads = 4
+    if threads == 1:
+        for yamlMap in yamlMaps:
+            downloadBackgroundAndMusic(yamlMap, backgrounds)
+    else:
+        with Pool(threads) as p:
+            p.map(functools.partial(downloadBackgroundAndMusic, backgrounds=backgrounds), yamlMaps)
 
 def createMapListFile(yamlMaps : list[Path], outputCsvFilePath : Path) -> int:
     mapsConfig = dict()
