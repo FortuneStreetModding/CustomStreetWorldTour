@@ -1,0 +1,17 @@
+# ---------------------------------------------------------
+# ------------ More Memory for AI Lookahead ---------------
+# ---------------------------------------------------------
+#
+# Increases the memory the AI has for lookahead calculation from
+# 64kB to 128kB
+#
+patches:
+- boomAddress:   0x8009e6c4
+  format:        hex
+  originalValue: 3c 80 00 01
+  patchValue:    3c 80 00 02
+- boomAddress:   0x8009d368
+  format:        hex
+  originalValue: 3c 80 00 01
+  patchValue:    3c 80 00 02
+
