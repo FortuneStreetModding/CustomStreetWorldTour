@@ -15,6 +15,11 @@ from pygit2 import GitError
 from multiprocessing import Pool
 from termcolor import cprint
 
+# import exceptions
+from urllib.error import URLError
+from zipfile import BadZipFile
+from zlib import error as zlibError
+
 import functools
 import os
 import json
@@ -155,8 +160,12 @@ def download(path : str, mirrors, label : str, config : configparser.ConfigParse
             try:
                 if download(path, mirror, label, config, config_section, update, False):
                     return True
-            except urllib.error.URLError as e:
+            except URLError as e:
                 cprint(f'{label:30} Download error: {str(e.reason)}', 'yellow')
+            except BadZipFile as e:
+                cprint(f'{label:30} Extraction error: {str(e)}', 'yellow')
+            except zlibError as e:
+                cprint(f'{label:30} Extraction error: {str(e)}', 'yellow')
         if print_failure:
             cprint(f'{label:30} Failed!', 'red')
         return False
