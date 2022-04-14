@@ -175,7 +175,7 @@ def download(path : str, mirrors, label : str, config : configparser.ConfigParse
     else:
         print(f'{label:30} Downloading {url}...')
 
-    with TemporaryDirectory(prefix="CSWT_", ignore_cleanup_errors=True) as tempDir:
+    with TemporaryDirectory(prefix="CSWT_") as tempDir:
         if 'drive.google.com' in url:
             zipFileDownload = gdown.download(url, Path(tempDir).as_posix() + os.path.sep, quiet=True)
             if zipFileDownload == None:
