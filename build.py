@@ -14,6 +14,7 @@ from PIL import ImageFont
 from pygit2 import GitError
 from multiprocessing import Pool
 from termcolor import cprint
+from tempfile import TemporaryDirectory
 
 # import exceptions
 from urllib.error import URLError
@@ -173,27 +174,31 @@ def download(path : str, mirrors, label : str, config : configparser.ConfigParse
         print(f'{label:30} Updating {url}...')
     else:
         print(f'{label:30} Downloading {url}...')
-    if 'drive.google.com' in url:
-        zipFileDownload = gdown.download(url, quiet=True)
-        if zipFileDownload == None:
-            if print_failure:
-                cprint(f'{label:30}: Failed!', 'red')
-            return False
-    else:
-        lastUrlPart = url.rsplit('/', 1)[-1]
-        zipFileDownload = urllib.request.urlretrieve(url, lastUrlPart)[0]
-    print(f'{label:30} Extracting {zipFileDownload}...')
-    gdown.extractall(zipFileDownload, path)
-    # remember the filesize
-    file_size = os.path.getsize(zipFileDownload)
-    config_update_file_size(config, config_section, file_size)
-    # remove the zip file
-    os.remove(zipFileDownload)
-    if update:
-        cprint(f'{label:30} Update Complete!', 'green')
-    else:
-        cprint(f'{label:30} Download Complete!', 'green')
-    return True
+
+    with TemporaryDirectory(prefix="CSWT_", ignore_cleanup_errors=True) as tempDir:
+        if 'drive.google.com' in url:
+            zipFileDownload = gdown.download(url, Path(tempDir).as_posix() + os.path.sep, quiet=True)
+            if zipFileDownload == None:
+                if print_failure:
+                    cprint(f'{label:30}: Failed!', 'red')
+                return False
+        else:
+            lastUrlPart = url.rsplit('/', 1)[-1]
+            downloadPath = Path(tempDir) / Path(lastUrlPart)
+            zipFileDownload = urllib.request.urlretrieve(url, downloadPath.as_posix())[0]
+        zipFileName = Path(zipFileDownload).name
+        print(f'{label:30} Extracting {zipFileName}...')
+        gdown.extractall(zipFileDownload, path)
+        # remember the filesize
+        file_size = os.path.getsize(zipFileDownload)
+        config_update_file_size(config, config_section, file_size)
+        # remove the zip file
+        os.remove(zipFileDownload)
+        if update:
+            cprint(f'{label:30} Update Complete!', 'green')
+        else:
+            cprint(f'{label:30} Download Complete!', 'green')
+        return True
 
 def getValidCandidates(wit : str, path : Path) -> list[FileTypeInfo]:
     validCandidates = []
