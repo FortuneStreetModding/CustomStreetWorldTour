@@ -95,6 +95,7 @@
   - AegisRim
   - AlchemistsHouse
   - Anchor
+  - BabyPark
   - Bakerman
   - CatMap
   - CidsTower
@@ -107,10 +108,11 @@
   - DKsJungleAdventure
   - Downhill
   - DungeonLobby
-  - FacingWorlds
   1:
+  - FacingWorlds
   - IS2FreewayRemix
   - Freighter
+  - GeometryDash
   - GoodybagLair
   - Hell
   - HighRise
@@ -125,9 +127,9 @@
   - Monokuma
   - Neazi1
   - Neazi2
+  2:
   - Neazi3
   - Neazi4
-  2:
   - Neazi5
   - Neazi6
   - NLA
@@ -140,8 +142,8 @@
   - RainbowDream
   - Rokkenjima
   - MobileSchool
-  - Skullboard
   - ShellIsleRedux
+  - Skullboard
   - Shibuya
   - Schneggl
   - Spirograph
@@ -156,8 +158,6 @@
   - Vulvainseln
   - WariosBattleCanyon
   - Yoshi
-  - EventSpiral
-  - EventSpiral
   - EventSpiral
   - EventSpiral
   - EventSpiral
