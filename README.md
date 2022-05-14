@@ -4,6 +4,8 @@
 
 Custom Street World Tour is an easy-to-install map pack for Fortune Street and Boom Street containing over a hundred custom boards from the [Custom Street Board Repository](https://fortunestreetmodding.github.io/maps), some including custom music and backgrounds.
 
+NOTE: If you are planning on playing on Console, please use the [Console Branch](https://github.com/FortuneStreetModding/CustomStreetWorldTour/tree/console-branch) instead.
+
 ## For end users
 
 1. Download [setup.bat](Setup/setup.bat) (Windows) or [setup.sh](Setup/setup.sh) (Unix) (on the page, right click 'Raw' and save linked content)
