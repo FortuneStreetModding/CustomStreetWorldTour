@@ -2,6 +2,8 @@
 
 ![](CustomStreetWorldTourTitle.webp)
 
+Custom Street World Tour is a map pack for Fortune Street and Boom Street containing over a hundred custom boards from the [Custom Street Board Repository](https://fortunestreetmodding.github.io/maps).
+
 ## For end users
 
 1. Download [setup.bat](Setup/setup.bat) (Windows) or [setup.sh](Setup/setup.sh) (Unix) (on the page, right click 'Raw' and save linked content)
