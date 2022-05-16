@@ -25,7 +25,7 @@ jobs:
         rm fortunestreetmodding.github.io/_maps/*/*.webp
         rm *.webp
         rm *.md
-        zip -v CustomStreetWorldTour-${VERSION_NAME}.zip -r files -r patches -r fortunestreetmodding.github.io/_maps fortunestreetmodding.github.io/_data/backgrounds.yml *.*
+        zip -r -v CustomStreetWorldTour-${VERSION_NAME}.zip files/ patches/ fortunestreetmodding.github.io/_maps/ fortunestreetmodding.github.io/_data/backgrounds.yml DejaVuSans-Bold.ttf build.* *.py customStreetWorldTour.yaml requirements.txt
       working-directory: ${{github.workspace}}
 
     - name: Release
