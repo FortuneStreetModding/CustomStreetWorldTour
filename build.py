@@ -296,6 +296,9 @@ def downloadBackgroundAndMusic(yamlMap : Path, backgrounds : dict, resourcesDire
                     filesRequired = list()
                     filesRequired.append(background + '.cmpres')
                     filesRequired.append(background + '.scene')
+                    filesRequired.append(f"ui_menu_{background}_a.png")
+                    filesRequired.append(f"ui_menu_{background}_b.png")
+                    filesRequired.append(f"ui_menu_{background}_c.png")
                     if 'music' in definedBackground:
                         for musicType in definedBackground['music']:
                             if musicType != 'download' and definedBackground['music'][musicType]:
@@ -307,7 +310,7 @@ def downloadBackgroundAndMusic(yamlMap : Path, backgrounds : dict, resourcesDire
                             if not fileRequired in filesAvailable:
                                 fileInResourcesDirectoryPath = Path(resourcesDirectory) / Path(fileRequired)
                                 if fileInResourcesDirectoryPath.exists():
-                                    shutil.copy(fileInResourcesDirectoryPath, fileRequired)
+                                    shutil.copy(fileInResourcesDirectoryPath, yamlMap.parent)
                                     filesAvailable.append(fileRequired)
 
                     # download is required if not all required files are available
@@ -340,7 +343,7 @@ def downloadBackgroundAndMusic(yamlMap : Path, backgrounds : dict, resourcesDire
                         if not fileRequired in filesAvailable:
                             fileInResourcesDirectoryPath = Path(resourcesDirectory) / Path(fileRequired)
                             if fileInResourcesDirectoryPath.exists():
-                                shutil.copy(fileInResourcesDirectoryPath, fileRequired)
+                                shutil.copy(fileInResourcesDirectoryPath, yamlMap.parent)
                                 filesAvailable.append(fileRequired)
 
                 # download is required if not all required files are available
