@@ -24,7 +24,8 @@ jobs:
         cp ./Setup/release_build.bat ./build.bat
         cp ./Setup/release_build.sh ./build.sh
         cp ./Setup/release_requirements.txt ./requirements.txt
-        zip -v CustomStreetWorldTour-${VERSION_NAME}.zip -r files -r patches -x *.webp -r fortunestreetmodding.github.io/_maps build.* *.py requirements.txt
+        rm fortunestreetmodding.github.io/_maps/*/*.webp
+        zip -v CustomStreetWorldTour-${VERSION_NAME}.zip -r files -r patches -r fortunestreetmodding.github.io/_maps build.* *.py requirements.txt
       working-directory: ${{github.workspace}}
 
     - name: Release
