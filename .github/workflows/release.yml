@@ -1,0 +1,34 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+  push:
+    branches:
+      - 'release/**'
+  workflow_dispatch:
+
+env:
+  VERSION_NAME: ${{ github.event.release.tag_name }}
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+
+    - name: Archive
+      run: |
+        cp ./Setup/release_build.bat ./build.bat
+        cp ./Setup/release_build.sh ./build.sh
+        cp ./Setup/release_requirements.txt ./requirements.txt
+        zip -v CustomStreetWorldTour-${VERSION_NAME}.zip -r files -r patches -r fortunestreetmodding.github.io/_maps build.* requirements.txt
+      working-directory: ${{github.workspace}}
+
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: ${{github.workspace}}/CustomStreetWorldTour-${{github.event.release.tag_name}}.zip
