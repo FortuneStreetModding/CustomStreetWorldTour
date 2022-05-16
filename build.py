@@ -635,7 +635,7 @@ def main(argv : list):
         if not any(os.scandir(resources_dir)):
             print(f'Downloading resources package...')
             download(resources_dir, args.resources_mirror)
-        downloadBackgroundsAndMusic(yamlMaps, resources_dir)
+        downloadBackgroundsAndMusic(yamlMaps, resources_dir.as_posix())
         print("All maps checked")
     else:
         downloadBackgroundsAndMusic(yamlMaps)
