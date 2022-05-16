@@ -30,7 +30,6 @@ import csv
 import yaml
 import gdown
 import platform
-import tempfile
 import addressTranslator
 import struct
 import logging
@@ -79,7 +78,7 @@ def downloadReleaseFromGithub(executable : str, url : str, version : str):
     for asset in assets:
         if platform.system().lower() in asset['name']:
             filename = asset['name']
-            with TemporaryDirectory(prefix="CSWT_") as tempDir:
+            with TemporaryDirectory(prefix="CSWT_", ignore_cleanup_errors=True) as tempDir:
                 zipFileDownload = gdown.download(asset["browser_download_url"], Path(tempDir).as_posix() + os.path.sep)
                 if zipFileDownload == None:
                     raise Exception(f'{filename}: Failed!')
@@ -203,7 +202,7 @@ def download(path : str, mirrors, label : str = None, config : configparser.Conf
         else:
             print(f'{label}Downloading {url}...')
 
-    with TemporaryDirectory(prefix="CSWT_") as tempDir:
+    with TemporaryDirectory(prefix="CSWT_", ignore_cleanup_errors=True) as tempDir:
         zipFileDownload = gdown.download(url, Path(tempDir).as_posix() + os.path.sep, quiet=gdown_quiet)
         if zipFileDownload == None:
             if print_failure:
@@ -462,7 +461,7 @@ def patchArcs(dir : str, wszst : str, wimgt : str, version : str):
                 arcsToBePatched[arcPathStr] = []
             arcsToBePatched[arcPathStr].append(pngPath)
     for arcToBePatched in arcsToBePatched:
-        with tempfile.TemporaryDirectory() as tmpdirname:
+        with TemporaryDirectory(prefix="CSWT_", ignore_cleanup_errors=True) as tmpdirname:
             print(check_output([wszst, 'EXTRACT', arcToBePatched, '--dest', tmpdirname, '--overwrite'], encoding="utf-8"))
             for pngPath in arcsToBePatched[arcToBePatched]:
                 pngPath = Path(pngPath)
@@ -544,10 +543,6 @@ def applyHexEdits(mainDol : str):
                     stream.write(struct.pack(format, patchValue))
                 print(f'  {hex(fileAddress)}: {originalValue} -> {patchValue}')
 
-def relocateResourcesToMapsFolder(resourcesDirectory : Path, mapsDirectory : list[Path]):
-
-    pass
-
 def main(argv : list):
     parser = argparse.ArgumentParser()
     parser.add_argument('--input-file', action='store', help='The input image of either Fortune Street or Boom Street in wbfs or iso format')
@@ -571,7 +566,9 @@ def main(argv : list):
         sys.exit()
 
     print(f"Fetching CSMM required tools...")
-    searchPath = Path(fetchLastLineOfString(check_output([csmm, 'download-tools', '--force'], encoding="utf-8")))
+    output = check_output([csmm, 'download-tools', '--force'], encoding="utf-8")
+    print(output)
+    searchPath = Path(fetchLastLineOfString(output))
 
     print(f"wit: ", end='')
     wit = findExecutable("wit", searchPath=searchPath)

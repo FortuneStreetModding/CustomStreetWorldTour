@@ -23,7 +23,7 @@ jobs:
       run: |
         cp ./release/* .
         rm fortunestreetmodding.github.io/_maps/*/*.webp
-        zip -v CustomStreetWorldTour-${VERSION_NAME}.zip -r files -r patches -r fortunestreetmodding.github.io/_maps build.* *.py requirements.txt
+        zip -v CustomStreetWorldTour-${VERSION_NAME}.zip -r files -r patches -r fortunestreetmodding.github.io/_maps fortunestreetmodding.github.io/_data/backgrounds.yml build.* *.py requirements.txt
       working-directory: ${{github.workspace}}
 
     - name: Release
