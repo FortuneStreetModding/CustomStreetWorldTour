@@ -352,9 +352,9 @@ def downloadBackgroundAndMusic(yamlMap : Path, backgrounds : dict, resourcesDire
                 mirrors = yamlContent['music']['download']
                 config_section = "music"
                 label = f'{yamlMap.parent.name}_music'
-                # download is also required when the filesize does not match the server
+                # download is also required when the filesize does not match the server (but we only try to update if we did not have an all-in-one resources zip file provided)
                 update = False
-                if not downloadRequired:
+                if not downloadRequired and not resourcesDirectory:
                     update = check_update_available(config, config_section, mirrors)
                     if update:
                         downloadRequired = True
