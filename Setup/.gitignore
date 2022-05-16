@@ -2,6 +2,3 @@
 !.gitignore
 !setup.bat
 !setup.sh
-!release_build.bat
-!release_build.sh
-!release_requirements.txt
