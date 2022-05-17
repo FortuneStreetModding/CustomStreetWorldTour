@@ -515,7 +515,7 @@ def applyHexEdits(mainDol : str):
         else:
             boom = False
 
-    patchFiles = list(Path().glob('patches/*.yaml'))
+    patchFiles = list(Path().glob('patches/*.[yaml][yml]'))
     patchLists = {}
     for patchFile in patchFiles:
         patch = dict()
@@ -629,7 +629,7 @@ def main(argv : list):
         print(f'Extracting {str(file)} to {file.stem}...')
         check_output([csmm, 'extract', str(file), file.stem], encoding="utf-8")
 
-    yamlMaps = list(Path().glob('fortunestreetmodding.github.io/_maps/*/*.yaml'))
+    yamlMaps = list(Path().glob('fortunestreetmodding.github.io/_maps/*/*.[yaml][yml]'))
 
     resources_dir = Path("resources")
     if args.resources_mirror:
