@@ -24,7 +24,7 @@ IF ERRORLEVEL 0 (
         --csmm-version 1.7.4 ^
         --resources-mirror "https://nikkums.io/cswt/1.0/CSWT1Files.zip" ^
         --resources-mirror "https://drive.google.com/u/2/uc?id=1NvI7Y7o9vAC7ibBkGt1m4qozfkMm-_Jq&export=download&confirm=1" ^
-        --boards-list-file "CustomStreetWorldTour.yaml" ^
+        --boards-list-file "CustomStreetWorldTour_console.yaml" ^
         --overwrite-extracted-directory
 )
 @pause

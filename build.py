@@ -385,9 +385,9 @@ def downloadBackgroundsAndMusic(yamlMaps : list[Path], resourcesDirectory : str 
             p.map(functools.partial(downloadBackgroundAndMusic, backgrounds=backgrounds, resourcesDirectory=resourcesDirectory), yamlMaps)
         
 
-def createMapListFile(yamlMaps : list[Path], outputCsvFilePath : Path) -> int:
+def createMapListFile(yamlFile : str, yamlMaps : list[Path], outputCsvFilePath : Path) -> int:
     mapsConfig = dict()
-    with open('customStreetWorldTour.yaml', "r", encoding='utf8') as stream:
+    with open(yamlFile, "r", encoding='utf8') as stream:
         try:
             mapsConfig = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
@@ -553,6 +553,7 @@ def main(argv : list):
     parser.add_argument('--output-version', action='store', help='Output CSWT version')
     parser.add_argument('--resources-mirror', action='append', help='Specify a download URL where this script will download all required resources')
     parser.add_argument('--overwrite-extracted-directory', action='store_true', help='Avoids reusing an old extracted directory which can be a cause for errors')
+    parser.add_argument('--boards-list-file', default="CustomStreetWorldTour.yaml", action='store', help='The yaml file which contains the boards that should be used')
     args = parser.parse_args(argv)
 
     colorama.init()
@@ -649,7 +650,7 @@ def main(argv : list):
     print(f'Patching localization files...')
     patchLocalize(file.stem)
 
-    mapCount = createMapListFile(yamlMaps, Path(file.stem + '/csmm_pending_changes.csv'))
+    mapCount = createMapListFile(args.boards_list_file, yamlMaps, Path(file.stem + '/csmm_pending_changes.csv'))
 
     print(f'Saving {str(mapCount)} maps to {file.stem}...')
     output = check_output([csmm, 'save', '--addAuthorToDescription', '1', file.stem], encoding="utf-8")
