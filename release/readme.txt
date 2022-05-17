@@ -20,3 +20,4 @@ The fix for this issue is to start Internet Explorer at least once
 # Known Issues
 
 - Tour mode does not really work with custom maps. Completed maps are not saved.
+- In Wiimmfi mode some boards may become locked and not selectable.
