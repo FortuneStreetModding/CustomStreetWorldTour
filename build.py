@@ -685,8 +685,6 @@ def main(argv : list):
         cprint(count*'*', 'green')
         cprint(f'* {msg} *', 'green')
         cprint(count*'*', 'green')
-        if resources_dir.exists():
-            shutil.rmtree(resources_dir)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
