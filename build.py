@@ -394,6 +394,7 @@ def createMapListFile(yamlFile : str, yamlMaps : list[Path], outputCsvFilePath :
             print(exc)
 
     id = 0
+    mapList = []
     with open(outputCsvFilePath, 'w+', newline='', encoding='utf8') as csvfile:
         fieldnames = ['id', 'mapSet', 'zone', 'order', 'practiceBoard', 'name', 'yaml']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -417,7 +418,8 @@ def createMapListFile(yamlFile : str, yamlMaps : list[Path], outputCsvFilePath :
                     writer.writerow({'id': id, 'mapSet': mapSet, 'zone': zone, 'order': order, 'practiceBoard': practiceBoard, 'name': mapDir, 'yaml': yamlPath})
                     id += 1
                     order += 1
-    return id
+                    mapList.append(yamlPath)
+    return mapList
 
 def resolveAll(path : Path, isLocalizeType : bool) -> list[Path]:
     paths = []
@@ -630,7 +632,14 @@ def main(argv : list):
         print(f'Extracting {str(file)} to {file.stem}...')
         check_output([csmm, 'extract', str(file), file.stem], encoding="utf-8")
 
+    # glob all yaml files in the maps directory
     yamlMaps = list(Path().glob('fortunestreetmodding.github.io/_maps/*/*.[yaml][yml]'))
+
+    # create the csmm_pending_changes.csv file which is required by csmm
+    mapList = createMapListFile(args.boards_list_file, yamlMaps, Path(file.stem + '/csmm_pending_changes.csv'))
+
+    # filter the maps out which are not in the boards_configuration
+    yamlMaps = filter(lambda yamlMap: yamlMap in mapList, yamlMaps)
 
     resources_dir = Path("resources")
     if args.resources_mirror:
@@ -650,9 +659,7 @@ def main(argv : list):
     print(f'Patching localization files...')
     patchLocalize(file.stem)
 
-    mapCount = createMapListFile(args.boards_list_file, yamlMaps, Path(file.stem + '/csmm_pending_changes.csv'))
-
-    print(f'Saving {str(mapCount)} maps to {file.stem}...')
+    print(f'Saving {str(len(mapList))} maps to {file.stem}...')
     output = check_output([csmm, 'save', '--addAuthorToDescription', '1', file.stem], encoding="utf-8")
     print(output)
 
