@@ -1,0 +1,26 @@
+# ---------------------------------------------------------
+# ------------ Slurpodrome Prize Values ---------------
+# ---------------------------------------------------------
+#
+# -------------- Things you may want to modify -----------------
+definitions: 
+- &slurpodrome_easy_mode_prize_value 100
+- &slurpodrome_easy_mode_coin_value 20
+# ----------- Things that should not be modified ----------------
+- &original_slurpodrome_easy_mode_prize_value 200
+- &original_slurpodrome_easy_mode_coin_value 40
+patches:
+- boomAddress:   0x8081b5a8
+  format:        ">I"
+  originalValue: *original_slurpodrome_easy_mode_prize_value
+  patchValue:    *slurpodrome_easy_mode_prize_value
+- boomAddress:   0x8081b5a0
+  format:        ">I"
+  originalValue: *original_slurpodrome_easy_mode_coin_value
+  patchValue:    *slurpodrome_easy_mode_coin_value
+# always take standard mode settings in the darts mini game regardless of mapset
+- boomAddress:   0x8013cda4
+  format:        hex
+  originalValue: 40 82 00 0c
+  patchValue:    48 00 00 0c
+

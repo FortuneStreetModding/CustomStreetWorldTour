@@ -9,13 +9,13 @@ If you are on MacOS, you need to install python yourself as prerequisite before 
 
 # Troubleshooting
 
-## Building fails with the Error Message "Unable to start winget"
+## Building fails with the error message: 'winget' is not recognized as an internal or external command, operable program or batch file.
 
 Go to the Microsoft Store and install the package "App Installer"
 
-## Building fails with the Error Message "QTemporaryDir: Unable to remove due to read-only files"
+## Building fails with the error message: QTemporaryDir: Unable to remove "C:\\Users\\...." most likely due to the presence of read-only-files.
 
-The fix for this issue is to start Internet Explorer at least once
+Start Internet Explorer. A dialog should pop up which says "Set up Internet Explorer". Use the recommended settings and click OK. Now you can close Internet Explorer and try again.
 
 # Known Issues
 
