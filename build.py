@@ -418,7 +418,7 @@ def createMapListFile(yamlFile : str, yamlMaps : list[Path], outputCsvFilePath :
                     writer.writerow({'id': id, 'mapSet': mapSet, 'zone': zone, 'order': order, 'practiceBoard': practiceBoard, 'name': mapDir, 'yaml': yamlPath})
                     id += 1
                     order += 1
-                    mapList.append(yamlPath)
+                    mapList.append(mapDir)
     return mapList
 
 def resolveAll(path : Path, isLocalizeType : bool) -> list[Path]:
@@ -639,7 +639,7 @@ def main(argv : list):
     mapList = createMapListFile(args.boards_list_file, yamlMaps, Path(file.stem + '/csmm_pending_changes.csv'))
 
     # filter the maps out which are not in the boards_configuration
-    yamlMaps = filter(lambda yamlMap: yamlMap in mapList, yamlMaps)
+    yamlMaps = list(filter(lambda yamlMap: yamlMap.parent.name in mapList, yamlMaps))
 
     resources_dir = Path("resources")
     if args.resources_mirror:
