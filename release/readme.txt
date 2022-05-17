@@ -19,5 +19,4 @@ The fix for this issue is to start Internet Explorer at least once
 
 # Known Issues
 
-- The Custom Boards are filled with Event Spiral boards at the end. These boards are not meant to be played and serve as placeholder.
 - Tour mode does not really work with custom maps. Completed maps are not saved.

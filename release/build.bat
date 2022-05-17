@@ -21,7 +21,7 @@ python -m pip install --requirement requirements.txt --user
 IF ERRORLEVEL 0 (
     python build.py ^
         --output-version 1.0 ^
-        --csmm-version 1.7.4 ^
+        --csmm-version 1.7.5 ^
         --resources-mirror "https://nikkums.io/cswt/1.0/CSWT1Files.zip" ^
         --resources-mirror "https://drive.google.com/u/2/uc?id=1NvI7Y7o9vAC7ibBkGt1m4qozfkMm-_Jq&export=download&confirm=1" ^
         --boards-list-file "CustomStreetWorldTour.yaml" ^
