@@ -25,7 +25,7 @@ jobs:
         rm fortunestreetmodding.github.io/_maps/*/*.webp
         rm *.webp
         rm *.md
-        zip -r -v CustomStreetWorldTour-${VERSION_NAME}.zip files/ patches/ fortunestreetmodding.github.io/_maps/ fortunestreetmodding.github.io/_data/backgrounds.yml *.ttf build.* *.py *.yaml *.yml requirements.txt
+        zip -r -v CustomStreetWorldTour-${VERSION_NAME}.zip files/ patches/ fortunestreetmodding.github.io/_maps/ fortunestreetmodding.github.io/_data/backgrounds.yml *.ttf *.sh *.bat *.py *.yaml *.yml *.txt
       working-directory: ${{github.workspace}}
 
     - name: Release
