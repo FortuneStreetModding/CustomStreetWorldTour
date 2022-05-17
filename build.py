@@ -517,7 +517,7 @@ def applyHexEdits(mainDol : str):
         else:
             boom = False
 
-    patchFiles = list(Path().glob('patches/*.[yaml][yml]'))
+    patchFiles = list(Path().glob('patches/*.y*ml'))
     patchLists = {}
     for patchFile in patchFiles:
         patch = dict()
@@ -633,7 +633,7 @@ def main(argv : list):
         check_output([csmm, 'extract', str(file), file.stem], encoding="utf-8")
 
     # glob all yaml files in the maps directory
-    yamlMaps = list(Path().glob('fortunestreetmodding.github.io/_maps/*/*.[yaml][yml]'))
+    yamlMaps = list(Path().glob('fortunestreetmodding.github.io/_maps/*/*.y*ml'))
 
     # create the csmm_pending_changes.csv file which is required by csmm
     mapList = createMapListFile(args.boards_list_file, yamlMaps, Path(file.stem + '/csmm_pending_changes.csv'))
