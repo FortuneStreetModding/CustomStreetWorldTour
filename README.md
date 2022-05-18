@@ -4,25 +4,29 @@
 
 Custom Street World Tour is an easy-to-install map pack for Fortune Street and Boom Street containing over a hundred custom boards from the [Custom Street Board Repository](https://fortunestreetmodding.github.io/maps), some including custom music and backgrounds.
 
-NOTE: If you are planning on playing on Console, please use the [Console Branch](https://github.com/FortuneStreetModding/CustomStreetWorldTour/tree/console-branch) instead.
+**Version 1.0 is available now! This is a tested and stable release with 135 new boards, as well as the inclusion of a console-friendly version. See releases on the right to download.**
 
-## For end users
+If you would like to install the latest dev build of CSWT instead, see below.
+
+## For Genral Users
 
 1. Download [setup.bat](Setup/setup.bat) (Windows) or [setup.sh](Setup/setup.sh) (Unix) (on the page, right click 'Raw' and save linked content)
 2. Put the `setup.bat`/`setup.sh` and a vanilla Fortune Street or Boom Street iso/wbfs into a new empty directory
 3. Run the `setup.bat`/`setup.sh` to set up the needed tools automatically
 4. Run the `CustomStreetWorldTour/build.bat` (Windows) or `CustomStreetWorldTour/build.sh` (Unix) to build Custom Street World Tour
 
-## For developers
+## For Developers
 
 - You need to have [git](https://git-scm.com/) installed
 - You need to have [python](https://www.python.org/) installed (at least version 3.9)
   - During installation of python make sure to check the checkbox "Add Python to PATH"
 - You need to have copy of Fortune Street or Boom Street (.iso or .wbfs). This file needs to be in the same directory as this script. Also make sure there is only one original iso/wbfs in this directory.
 
-#### Getting Started for developers
+#### Getting Started for Developers
 
 1. Clone this repository using git. Do not forget to clone submodules as well.
 2. Install the needed python packages using `python -m pip install --requirement requirements.txt`
 3. Put a vanilla Fortune Street or Boom Street (.iso or .wbfs) into the same path. The iso image should also not contain any special characters and no spaces.
 4. Start the `build.bat` (windows) or `build.sh` (unix) file to run the build.
+
+#### [For any questions or feedback, please visit our Discord!](https://discord.gg/DE9Hn7T)
