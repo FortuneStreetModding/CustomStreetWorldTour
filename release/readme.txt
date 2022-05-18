@@ -17,6 +17,10 @@ Go to the Microsoft Store and install the package "App Installer"
 
 Start Internet Explorer. A dialog should pop up which says "Set up Internet Explorer". Use the recommended settings and click OK. Now you can close Internet Explorer and try again.
 
+## Building fails with the error message: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:997)>
+
+Check this link: https://www.dev2qa.com/how-to-fix-python-error-certificate-verify-failed-unable-to-get-local-issuer-certificate-in-mac-os/
+
 # Known Issues
 
 - Tour mode does not really work with custom maps. Completed maps are not saved.
