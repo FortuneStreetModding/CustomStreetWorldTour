@@ -6,11 +6,13 @@ Custom Street World Tour is an easy-to-install map pack for Fortune Street and B
 
 ## Latest Stable Release
 
-**Version 1.0 is available now! This is a tested and stable release with 135 new boards, as well as the inclusion of a console-friendly version. See releases on the right to download.**
+### Version 1.0
+
+This is a tested and stable release with 135 new boards, as well as the inclusion of a console-friendly version. See releases on the right to download.
 
 ## Latest Development Build
 
-The development build contains all the latest boards and changes to CSWT, but it is not as thoroughly tested as the stable releases and lacks support for playing on console.
+The development build contains all the latest boards and changes to CSWT, but it is not as thoroughly tested as the stable releases and lacks support for playing on console. See below for downloads and installation instructions.
 
 ### For Genral Users
 
