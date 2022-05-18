@@ -30,7 +30,6 @@ import csv
 import yaml
 import gdown
 import platform
-import tempfile
 import addressTranslator
 import struct
 import logging
@@ -79,7 +78,7 @@ def downloadReleaseFromGithub(executable : str, url : str, version : str):
     for asset in assets:
         if platform.system().lower() in asset['name']:
             filename = asset['name']
-            with TemporaryDirectory(prefix="CSWT_") as tempDir:
+            with TemporaryDirectory(prefix="CSWT_", ignore_cleanup_errors=True) as tempDir:
                 zipFileDownload = gdown.download(asset["browser_download_url"], Path(tempDir).as_posix() + os.path.sep)
                 if zipFileDownload == None:
                     raise Exception(f'{filename}: Failed!')
@@ -203,7 +202,7 @@ def download(path : str, mirrors, label : str = None, config : configparser.Conf
         else:
             print(f'{label}Downloading {url}...')
 
-    with TemporaryDirectory(prefix="CSWT_") as tempDir:
+    with TemporaryDirectory(prefix="CSWT_", ignore_cleanup_errors=True) as tempDir:
         zipFileDownload = gdown.download(url, Path(tempDir).as_posix() + os.path.sep, quiet=gdown_quiet)
         if zipFileDownload == None:
             if print_failure:
@@ -297,6 +296,9 @@ def downloadBackgroundAndMusic(yamlMap : Path, backgrounds : dict, resourcesDire
                     filesRequired = list()
                     filesRequired.append(background + '.cmpres')
                     filesRequired.append(background + '.scene')
+                    filesRequired.append(f"ui_menu_{background}_a.png")
+                    filesRequired.append(f"ui_menu_{background}_b.png")
+                    filesRequired.append(f"ui_menu_{background}_c.png")
                     if 'music' in definedBackground:
                         for musicType in definedBackground['music']:
                             if musicType != 'download' and definedBackground['music'][musicType]:
@@ -308,7 +310,7 @@ def downloadBackgroundAndMusic(yamlMap : Path, backgrounds : dict, resourcesDire
                             if not fileRequired in filesAvailable:
                                 fileInResourcesDirectoryPath = Path(resourcesDirectory) / Path(fileRequired)
                                 if fileInResourcesDirectoryPath.exists():
-                                    shutil.copy(fileInResourcesDirectoryPath, fileRequired)
+                                    shutil.copy(fileInResourcesDirectoryPath, yamlMap.parent)
                                     filesAvailable.append(fileRequired)
 
                     # download is required if not all required files are available
@@ -341,7 +343,7 @@ def downloadBackgroundAndMusic(yamlMap : Path, backgrounds : dict, resourcesDire
                         if not fileRequired in filesAvailable:
                             fileInResourcesDirectoryPath = Path(resourcesDirectory) / Path(fileRequired)
                             if fileInResourcesDirectoryPath.exists():
-                                shutil.copy(fileInResourcesDirectoryPath, fileRequired)
+                                shutil.copy(fileInResourcesDirectoryPath, yamlMap.parent)
                                 filesAvailable.append(fileRequired)
 
                 # download is required if not all required files are available
@@ -350,9 +352,9 @@ def downloadBackgroundAndMusic(yamlMap : Path, backgrounds : dict, resourcesDire
                 mirrors = yamlContent['music']['download']
                 config_section = "music"
                 label = f'{yamlMap.parent.name}_music'
-                # download is also required when the filesize does not match the server
+                # download is also required when the filesize does not match the server (but we only try to update if we did not have an all-in-one resources zip file provided)
                 update = False
-                if not downloadRequired:
+                if not downloadRequired and not resourcesDirectory:
                     update = check_update_available(config, config_section, mirrors)
                     if update:
                         downloadRequired = True
@@ -383,15 +385,16 @@ def downloadBackgroundsAndMusic(yamlMaps : list[Path], resourcesDirectory : str 
             p.map(functools.partial(downloadBackgroundAndMusic, backgrounds=backgrounds, resourcesDirectory=resourcesDirectory), yamlMaps)
         
 
-def createMapListFile(yamlMaps : list[Path], outputCsvFilePath : Path) -> int:
+def createMapListFile(yamlFile : str, yamlMaps : list[Path], outputCsvFilePath : Path) -> int:
     mapsConfig = dict()
-    with open('customStreetWorldTour.yaml', "r", encoding='utf8') as stream:
+    with open(yamlFile, "r", encoding='utf8') as stream:
         try:
             mapsConfig = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
             print(exc)
 
     id = 0
+    mapList = []
     with open(outputCsvFilePath, 'w+', newline='', encoding='utf8') as csvfile:
         fieldnames = ['id', 'mapSet', 'zone', 'order', 'practiceBoard', 'name', 'yaml']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -415,7 +418,8 @@ def createMapListFile(yamlMaps : list[Path], outputCsvFilePath : Path) -> int:
                     writer.writerow({'id': id, 'mapSet': mapSet, 'zone': zone, 'order': order, 'practiceBoard': practiceBoard, 'name': mapDir, 'yaml': yamlPath})
                     id += 1
                     order += 1
-    return id
+                    mapList.append(mapDir)
+    return mapList
 
 def resolveAll(path : Path, isLocalizeType : bool) -> list[Path]:
     paths = []
@@ -462,7 +466,7 @@ def patchArcs(dir : str, wszst : str, wimgt : str, version : str):
                 arcsToBePatched[arcPathStr] = []
             arcsToBePatched[arcPathStr].append(pngPath)
     for arcToBePatched in arcsToBePatched:
-        with tempfile.TemporaryDirectory() as tmpdirname:
+        with TemporaryDirectory(prefix="CSWT_", ignore_cleanup_errors=True) as tmpdirname:
             print(check_output([wszst, 'EXTRACT', arcToBePatched, '--dest', tmpdirname, '--overwrite'], encoding="utf-8"))
             for pngPath in arcsToBePatched[arcToBePatched]:
                 pngPath = Path(pngPath)
@@ -513,7 +517,7 @@ def applyHexEdits(mainDol : str):
         else:
             boom = False
 
-    patchFiles = list(Path().glob('patches/*.yaml'))
+    patchFiles = list(Path().glob('patches/*.y*ml'))
     patchLists = {}
     for patchFile in patchFiles:
         patch = dict()
@@ -544,10 +548,6 @@ def applyHexEdits(mainDol : str):
                     stream.write(struct.pack(format, patchValue))
                 print(f'  {hex(fileAddress)}: {originalValue} -> {patchValue}')
 
-def relocateResourcesToMapsFolder(resourcesDirectory : Path, mapsDirectory : list[Path]):
-
-    pass
-
 def main(argv : list):
     parser = argparse.ArgumentParser()
     parser.add_argument('--input-file', action='store', help='The input image of either Fortune Street or Boom Street in wbfs or iso format')
@@ -555,6 +555,7 @@ def main(argv : list):
     parser.add_argument('--output-version', action='store', help='Output CSWT version')
     parser.add_argument('--resources-mirror', action='append', help='Specify a download URL where this script will download all required resources')
     parser.add_argument('--overwrite-extracted-directory', action='store_true', help='Avoids reusing an old extracted directory which can be a cause for errors')
+    parser.add_argument('--boards-list-file', default="CustomStreetWorldTour.yaml", action='store', help='The yaml file which contains the boards that should be used')
     args = parser.parse_args(argv)
 
     colorama.init()
@@ -571,7 +572,9 @@ def main(argv : list):
         sys.exit()
 
     print(f"Fetching CSMM required tools...")
-    searchPath = Path(fetchLastLineOfString(check_output([csmm, 'download-tools', '--force'], encoding="utf-8")))
+    output = check_output([csmm, 'download-tools', '--force'], encoding="utf-8")
+    print(output)
+    searchPath = Path(fetchLastLineOfString(output))
 
     print(f"wit: ", end='')
     wit = findExecutable("wit", searchPath=searchPath)
@@ -629,7 +632,14 @@ def main(argv : list):
         print(f'Extracting {str(file)} to {file.stem}...')
         check_output([csmm, 'extract', str(file), file.stem], encoding="utf-8")
 
-    yamlMaps = list(Path().glob('fortunestreetmodding.github.io/_maps/*/*.yaml'))
+    # glob all yaml files in the maps directory
+    yamlMaps = list(Path().glob('fortunestreetmodding.github.io/_maps/*/*.y*ml'))
+
+    # create the csmm_pending_changes.csv file which is required by csmm
+    mapList = createMapListFile(args.boards_list_file, yamlMaps, Path(file.stem + '/csmm_pending_changes.csv'))
+
+    # filter the maps out which are not in the boards_configuration
+    yamlMaps = list(filter(lambda yamlMap: yamlMap.parent.name in mapList, yamlMaps))
 
     resources_dir = Path("resources")
     if args.resources_mirror:
@@ -638,7 +648,7 @@ def main(argv : list):
         if not any(os.scandir(resources_dir)):
             print(f'Downloading resources package...')
             download(resources_dir, args.resources_mirror)
-        downloadBackgroundsAndMusic(yamlMaps, resources_dir)
+        downloadBackgroundsAndMusic(yamlMaps, resources_dir.as_posix())
         print("All maps checked")
     else:
         downloadBackgroundsAndMusic(yamlMaps)
@@ -649,9 +659,7 @@ def main(argv : list):
     print(f'Patching localization files...')
     patchLocalize(file.stem)
 
-    mapCount = createMapListFile(yamlMaps, Path(file.stem + '/csmm_pending_changes.csv'))
-
-    print(f'Saving {str(mapCount)} maps to {file.stem}...')
+    print(f'Saving {str(len(mapList))} maps to {file.stem}...')
     output = check_output([csmm, 'save', '--addAuthorToDescription', '1', file.stem], encoding="utf-8")
     print(output)
 
@@ -677,8 +685,6 @@ def main(argv : list):
         cprint(count*'*', 'green')
         cprint(f'* {msg} *', 'green')
         cprint(count*'*', 'green')
-        if resources_dir.exists():
-            shutil.rmtree(resources_dir)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
