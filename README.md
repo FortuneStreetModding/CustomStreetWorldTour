@@ -14,7 +14,7 @@ This is a tested and stable release with 135 new boards, as well as the inclusio
 
 The development build contains all the latest boards and changes to CSWT, but it is not as thoroughly tested as the stable releases and lacks support for playing on console. See below for downloads and installation instructions.
 
-### For Genral Users
+### For General Users
 
 1. Download [setup.bat](Setup/setup.bat) (Windows) or [setup.sh](Setup/setup.sh) (Unix) (on the page, right click 'Raw' and save linked content)
 2. Put the `setup.bat`/`setup.sh` and a vanilla Fortune Street or Boom Street iso/wbfs into a new empty directory
