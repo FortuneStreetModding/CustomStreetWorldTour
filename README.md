@@ -1,6 +1,6 @@
 # Custom Street World Tour
 
-[![Alt text](https://img.youtube.com/vi/FBLjEDI3qWQ/0.jpg)](https://www.youtube.com/watch?v=FBLjEDI3qWQ)
+[![Alt text](https://media.discordapp.net/attachments/708085079980900476/976518362295316510/FTDV7BlaIAAtYyq.jpg)](https://www.youtube.com/watch?v=FBLjEDI3qWQ)
 
 Custom Street World Tour is an easy-to-install map pack for Fortune Street and Boom Street containing over a hundred custom boards from the [Custom Street Board Repository](https://fortunestreetmodding.github.io/maps), some including custom music and backgrounds.
 
