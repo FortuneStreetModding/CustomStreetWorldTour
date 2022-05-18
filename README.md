@@ -8,7 +8,7 @@ Custom Street World Tour is an easy-to-install map pack for Fortune Street and B
 
 ### [Version 1.0](https://github.com/FortuneStreetModding/CustomStreetWorldTour/releases/tag/1.0)
 
-This is a tested and stable release with 135 new boards, as well as the inclusion of a console-friendly version. See releases on the right to download.
+This is a tested and stable release with 135 new boards, as well as the inclusion of a console-friendly version.
 
 ## Latest Development Build
 
