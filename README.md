@@ -2,6 +2,18 @@
 
 Custom Street World Tour is an easy-to-install map pack for Fortune Street and Boom Street containing over a hundred custom boards from the [Custom Street Board Repository](https://fortunestreetmodding.github.io/maps), some including custom music and backgrounds.
 
+### Changes to Base Game
+
+- Easy mode maps removed. Easy Mode and Standard Mode menus (aka mapsets) replaced with 'Official Boards' and 'Custom Boards'.
+- Over 134 new maps (number gradually increasing with Development Build)
+- Changed mapset 0 minigames to mapset 1 variants, as almost all maps on both mapsets are standard mode.
+- Increased the memory the AI has for lookahead calculation from 64kB to 128kB. This makes more complex boards more stable.
+- Tax Office price reduced from 10% to 5%.
+- Home price increased per level from 30 to 60.
+- Three Star Shop value change from 1000 to 500 and price changed from 200 to 100.
+- All boards unlocked by default.
+- All characters unlokced by default.
+
 ## Latest Stable Release
 
 ### [Version 1.0](https://github.com/FortuneStreetModding/CustomStreetWorldTour/releases/tag/1.0)
