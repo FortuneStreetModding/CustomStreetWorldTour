@@ -45,4 +45,4 @@ The development build contains all the latest boards and changes to CSWT, but it
 3. Put a vanilla Fortune Street or Boom Street (.iso or .wbfs) into the same path. The iso image should also not contain any special characters and no spaces.
 4. Start the `build.bat` (windows) or `build.sh` (unix) file to run the build.
 
-#### [For any questions or feedback, please visit our Discord](https://discord.gg/DE9Hn7T)
+#### [For any questions or feedback, please visit our Discord.](https://discord.gg/DE9Hn7T)
