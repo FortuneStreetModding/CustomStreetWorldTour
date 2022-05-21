@@ -26,6 +26,7 @@
   - LakeMountain
   - Cloverland
   - MoonCity
+  2:
   - Gootrude
   - IS2Skyscraper
   - DreamWorld
@@ -38,7 +39,6 @@
   - PrimitiveEra
   - GKFLoatingContinent
   - IS3CandyLand
-  2:
   - IS3Rainforest
   - IS3Moonlight
   - IS3Machu
@@ -96,19 +96,20 @@
   - AlchemistsHouse
   - Anchor
   - BabyPark
+  1:
   - Bakerman
   - Reactor
   - CastleTown
   - CatMap
   - CidsTower
   - Creeper
+  2:
   - CrestOfFlames
   - Crossroads
   - CustomWorld
   - DelfinoRedux
   - Karo
   - DKsJungleAdventure
-  1:
   - Downhill
   - DungeonLobby
   - FacingWorlds
@@ -128,13 +129,13 @@
   - Lucky
   - Metamorph
   - Monokuma
-  2:
   - Neazi1
   - Neazi2
   - Neazi3
   - Neazi4
   - Neazi5
   - Neazi6
+  - Neazi7
   - NLA
   - Palamecia
   - PlanetMira
