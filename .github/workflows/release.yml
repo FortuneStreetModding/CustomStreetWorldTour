@@ -23,31 +23,29 @@ jobs:
       run: |
         pip3 install pyinstaller --disable-pip-version-check
 
-    - name: Move files
+    - name: Move release files
       shell: bash
       run: |
-        rm fortunestreetmodding.github.io/_maps/*/*.webp
-        rm *.webp
-        rm *.md
-        mkdir archive
-        mkdir archive/fortunestreetmodding.github.io
-        mv fortunestreetmodding.github.io/_maps archive/fortunestreetmodding.github.io/
-        mkdir archive/fortunestreetmodding.github.io/_data
-        mv fortunestreetmodding.github.io/_data/backgrounds.yml archive/fortunestreetmodding.github.io/_data/
-        mv files archive/
-        mv patches archive/
-        mv release/* archive/
-        mv -t archive/ *.ttf *.sh *.yaml *.yml *.txt || true
+        mv release/* ./
       working-directory: ${{github.workspace}}
 
     - name: Build
       run: |
-        pyinstaller --onefile --exclude-module pygit2 --name build --distpath dist archive/release.py
+        pyinstaller --onefile --exclude-module pygit2 --name build --distpath dist release.py
       working-directory: ${{github.workspace}}
 
-    - name: Move Build
+    - name: Prepare Archive
       shell: bash
       run: |
+        rm fortunestreetmodding.github.io/_maps/*/*.webp
+        mkdir archive
+        mkdir archive/fortunestreetmodding.github.io
+        mkdir archive/fortunestreetmodding.github.io/_data
+        mv fortunestreetmodding.github.io/_maps archive/fortunestreetmodding.github.io/
+        mv fortunestreetmodding.github.io/_data/backgrounds.yml archive/fortunestreetmodding.github.io/_data/
+        mv files archive/
+        mv patches archive/
+        mv -t archive/ *.ttf *.sh *.yaml *.yml || true
         mv dist/* archive/
       working-directory: ${{github.workspace}}
 
@@ -82,31 +80,29 @@ jobs:
       run: |
         pip install pyinstaller --disable-pip-version-check
 
-    - name: Move files
+    - name: Move release files
       shell: bash
       run: |
-        rm fortunestreetmodding.github.io/_maps/*/*.webp
-        rm *.webp
-        rm *.md
-        mkdir archive
-        mkdir archive/fortunestreetmodding.github.io
-        mv fortunestreetmodding.github.io/_maps archive/fortunestreetmodding.github.io/
-        mkdir archive/fortunestreetmodding.github.io/_data
-        mv fortunestreetmodding.github.io/_data/backgrounds.yml archive/fortunestreetmodding.github.io/_data/
-        mv files archive/
-        mv patches archive/
-        mv release/* archive/
-        mv -t archive/ *.ttf *.bat *.yaml *.yml *.txt || true
+        mv release/* ./
       working-directory: ${{github.workspace}}
 
     - name: Build
       run: |
-        pyinstaller --onefile --exclude-module pygit2 --name build --distpath dist archive/release.py
+        pyinstaller --onefile --exclude-module pygit2 --name build --distpath dist release.py
       working-directory: ${{github.workspace}}
 
-    - name: Move Build
+    - name: Prepare Archive
       shell: bash
       run: |
+        rm fortunestreetmodding.github.io/_maps/*/*.webp
+        mkdir archive
+        mkdir archive/fortunestreetmodding.github.io
+        mkdir archive/fortunestreetmodding.github.io/_data
+        mv fortunestreetmodding.github.io/_maps archive/fortunestreetmodding.github.io/
+        mv fortunestreetmodding.github.io/_data/backgrounds.yml archive/fortunestreetmodding.github.io/_data/
+        mv files archive/
+        mv patches archive/
+        mv -t archive/ *.ttf *.bat *.yaml *.yml || true
         mv dist/* archive/
       working-directory: ${{github.workspace}}
 
@@ -136,32 +132,3 @@ jobs:
     - uses: actions/checkout@v3
       with:
         submodules: true
-
-    - name: Archive
-      run: |
-        cp ./release/* .
-        rm fortunestreetmodding.github.io/_maps/*/*.webp
-        rm *.webp
-        rm *.md
-        zip -r -v CustomStreetWorldTour-${VERSION_NAME}.zip files/ patches/ fortunestreetmodding.github.io/_maps/ fortunestreetmodding.github.io/_data/backgrounds.yml *.ttf *.sh *.bat *.py *.yaml *.yml *.txt
-      working-directory: ${{github.workspace}}
-
-    - name: Archive
-      uses: thedoctor0/zip-release@master
-      with:
-        type: 'zip'
-        directory: ${{github.workspace}}/archive
-        filename: ../csmm-${{github.event.release.tag_name}}-windows.zip
-
-    - name: Release
-      uses: softprops/action-gh-release@v1
-      if: startsWith(github.ref, 'refs/tags/')
-      with:
-        files: ${{github.workspace}}/CustomStreetWorldTour-${{github.event.release.tag_name}}.zip
-
-    - name: Upload as artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: zip-file
-        path: |
-          ${{github.workspace}}/CustomStreetWorldTour-${{github.event.release.tag_name}}.zip
