@@ -369,14 +369,13 @@ def downloadBackgroundAndMusic(yamlMap : Path, backgrounds : dict, resourcesDire
         except yaml.YAMLError as exc:
             print(exc)
 
-def downloadBackgroundsAndMusic(yamlMaps : list[Path], resourcesDirectory : str = None):
+def downloadBackgroundsAndMusic(yamlMaps : list[Path], resourcesDirectory : str = None, threads: int = 4):
     backgrounds = dict()
     with open('fortunestreetmodding.github.io/_data/backgrounds.yml', "r", encoding='utf8') as stream:
         try:
             backgrounds = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
             print(exc)
-    threads = 4
     if threads == 1:
         for yamlMap in yamlMaps:
             downloadBackgroundAndMusic(yamlMap, backgrounds, resourcesDirectory)
@@ -548,23 +547,12 @@ def applyHexEdits(mainDol : str):
                     stream.write(struct.pack(format, patchValue))
                 print(f'  {hex(fileAddress)}: {originalValue} -> {patchValue}')
 
-def main(argv : list):
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--input-file', action='store', help='The input image of either Fortune Street or Boom Street in wbfs or iso format')
-    parser.add_argument('--csmm-version', action='store', help='CSMM version to use')
-    parser.add_argument('--output-version', action='store', help='Output CSWT version')
-    parser.add_argument('--resources-mirror', action='append', help='Specify a download URL where this script will download all required resources')
-    parser.add_argument('--overwrite-extracted-directory', action='store_true', help='Avoids reusing an old extracted directory which can be a cause for errors')
-    parser.add_argument('--boards-list-file', default="CustomStreetWorldTour.yaml", action='store', help='The yaml file which contains the boards that should be used')
-    args = parser.parse_args(argv)
-
-    colorama.init()
-
-    if args.csmm_version:
-        print(f"Fetching CSMM {args.csmm_version}...")
+def run(input_file: str, output_version: str, csmm_version: str, resources_mirror: list[str], overwrite_extracted_directory: bool, boards_list_file: str, threads: int):
+    if csmm_version:
+        print(f"Fetching CSMM {csmm_version}...")
     else:
         print(f"Fetching CSMM")
-    csmm = findExecutable("csmm", downloadUrl=DOWNLOAD_URL_CSMM, version=args.csmm_version)
+    csmm = findExecutable("csmm", downloadUrl=DOWNLOAD_URL_CSMM, version=csmm_version)
     if csmm:
         print(f'csmm: {Path(csmm).absolute().as_posix()}')
     else:
@@ -600,11 +588,10 @@ def main(argv : list):
         print("Could not find wimgt executable")
         sys.exit()
 
-    if args.output_version:
-        version = args.output_version
+    if output_version:
+        version = output_version
     else:
         import pygit2
-        from pygit2 import GitError
         try:
             repo = pygit2.Repository('.git')
             head = repo.revparse_single('HEAD')
@@ -616,13 +603,13 @@ def main(argv : list):
                         version = ref.replace("refs/tags/", "")
                         break
             print(f'Using version {version}')
-        except GitError as err:
+        except pygit2.GitError as err:
             version = None
             print(f'Unable to determine version: {err.args[0]}')
 
-    file = getInputFortuneStreetFilePath(args.input_file, wit)
+    file = getInputFortuneStreetFilePath(input_file, wit)
 
-    if Path(file.stem).is_dir() and Path(file.stem).exists() and args.overwrite_extracted_directory:
+    if Path(file.stem).is_dir() and Path(file.stem).exists() and overwrite_extracted_directory:
         print(f'Deleting the folder {Path(file.stem).as_posix()}...')
         shutil.rmtree(Path(file.stem))
 
@@ -636,22 +623,22 @@ def main(argv : list):
     yamlMaps = list(Path().glob('fortunestreetmodding.github.io/_maps/*/*.y*ml'))
 
     # create the csmm_pending_changes.csv file which is required by csmm
-    mapList = createMapListFile(args.boards_list_file, yamlMaps, Path(file.stem + '/csmm_pending_changes.csv'))
+    mapList = createMapListFile(boards_list_file, yamlMaps, Path(file.stem + '/csmm_pending_changes.csv'))
 
     # filter the maps out which are not in the boards_configuration
     yamlMaps = list(filter(lambda yamlMap: yamlMap.parent.name in mapList, yamlMaps))
 
     resources_dir = Path("resources")
-    if args.resources_mirror:
+    if resources_mirror:
         if not resources_dir.exists():
             resources_dir.mkdir()
         if not any(os.scandir(resources_dir)):
             print(f'Downloading resources package...')
-            download(resources_dir, args.resources_mirror)
-        downloadBackgroundsAndMusic(yamlMaps, resources_dir.as_posix())
+            download(resources_dir, resources_mirror)
+        downloadBackgroundsAndMusic(yamlMaps, resources_dir.as_posix(), threads=threads)
         print("All maps checked")
     else:
-        downloadBackgroundsAndMusic(yamlMaps)
+        downloadBackgroundsAndMusic(yamlMaps, threads=threads)
 
     print(f'Patching arc files...')
     patchArcs(file.stem, wszst, wimgt, version)
@@ -687,4 +674,20 @@ def main(argv : list):
         cprint(count*'*', 'green')
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    colorama.init()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input-file', action='store', help='The input image of either Fortune Street or Boom Street in wbfs or iso format')
+    parser.add_argument('--csmm-version', action='store', help='CSMM version to use')
+    parser.add_argument('--output-version', action='store', help='Output CSWT version')
+    parser.add_argument('--resources-mirror', action='append', help='Specify a download URL where this script will download all required resources')
+    parser.add_argument('--overwrite-extracted-directory', action='store_true', help='Avoids reusing an old extracted directory which can be a cause for errors')
+    parser.add_argument('--boards-list-file', default="CustomStreetWorldTour.yaml", action='store', help='The yaml file which contains the boards that should be used')
+    parser.add_argument('--threads', default="4", type=int, action='store', help='The yaml file which contains the boards that should be used')
+    args = parser.parse_args()
+    run(args.input_file, 
+        args.csmm_version, 
+        args.output_version, 
+        args.resources_mirror, 
+        args.overwrite_extracted_directory, 
+        args.boards_list_file,
+        args.threads)

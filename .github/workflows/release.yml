@@ -12,7 +12,85 @@ env:
   VERSION_NAME: ${{ github.event.release.tag_name }}
 
 jobs:
-  release:
+  macos:
+    runs-on: macos-11
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+
+    - name: Prepare
+      shell: bash
+      run: |
+        cp ./release/* .
+        rm fortunestreetmodding.github.io/_maps/*/*.webp
+        rm *.webp
+        rm *.md
+      working-directory: ${{github.workspace}}
+
+    - name: Build
+      run: |
+        pyinstaller --onefile --exclude-module pygit2 --name build release.py
+      working-directory: ${{github.workspace}}
+
+    - name: Archive
+      run: |
+        zip -r -v CustomStreetWorldTour-${VERSION_NAME}-macos.zip files/ patches/ fortunestreetmodding.github.io/_maps/ fortunestreetmodding.github.io/_data/backgrounds.yml *.ttf *.sh *.bat *.yaml *.yml *.txt build
+      working-directory: ${{github.workspace}}
+
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: ${{github.workspace}}/CustomStreetWorldTour-${{github.event.release.tag_name}}-macos.zip
+
+    - name: Upload as artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: zip-file
+        path: |
+          ${{github.workspace}}/CustomStreetWorldTour-${{github.event.release.tag_name}}-macos.zip
+
+  windows:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+
+    - name: Prepare
+      shell: bash
+      run: |
+        cp ./release/* .
+        rm fortunestreetmodding.github.io/_maps/*/*.webp
+        rm *.webp
+        rm *.md
+      working-directory: ${{github.workspace}}
+
+    - name: Build
+      run: |
+        pyinstaller --onefile --exclude-module pygit2 --name build release.py
+      working-directory: ${{github.workspace}}
+
+    - name: Archive
+      run: |
+        zip -r -v CustomStreetWorldTour-${VERSION_NAME}-windows.zip files/ patches/ fortunestreetmodding.github.io/_maps/ fortunestreetmodding.github.io/_data/backgrounds.yml *.ttf *.sh *.bat *.yaml *.yml *.txt build.exe
+      working-directory: ${{github.workspace}}
+
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: ${{github.workspace}}/CustomStreetWorldTour-${{github.event.release.tag_name}}-windows.zip
+
+    - name: Upload as artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: zip-file
+        path: |
+          ${{github.workspace}}/CustomStreetWorldTour-${{github.event.release.tag_name}}-windows.zip
+
+  python:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
