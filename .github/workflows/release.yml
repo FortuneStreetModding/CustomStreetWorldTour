@@ -37,11 +37,7 @@ jobs:
         mv files archive/
         mv patches archive/
         mv release/* archive/
-        mv *.ttf archive/
-        mv *.bat archive/
-        mv *.yaml archive/
-        mv *.yml archive/
-        mv *.txt archive/
+        mv -t archive/ *.ttf *.sh *.yaml *.yml *.txt || true
       working-directory: ${{github.workspace}}
 
     - name: Build
@@ -94,11 +90,7 @@ jobs:
         mv files archive/
         mv patches archive/
         mv release/* archive/
-        mv *.ttf archive/
-        mv *.bat archive/
-        mv *.yaml archive/
-        mv *.yml archive/
-        mv *.txt archive/
+        mv -t archive/ *.ttf *.bat *.yaml *.yml *.txt || true
       working-directory: ${{github.workspace}}
 
     - name: Build
