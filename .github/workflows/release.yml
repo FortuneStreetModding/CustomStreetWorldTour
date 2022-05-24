@@ -42,8 +42,15 @@ jobs:
 
     - name: Build
       run: |
-        pyinstaller --onefile --exclude-module pygit2 --name build --distpath . release.py
+        pyinstaller --onefile --exclude-module pygit2 --name build --distpath dist release.py
       working-directory: ${{github.workspace}}/archive
+
+    - name: Move Build
+      shell: bash
+      run: |
+        mv dist/* archive/
+        rm archive/*.spec
+      working-directory: ${{github.workspace}}
 
     - name: Archive
       uses: thedoctor0/zip-release@master
@@ -95,8 +102,15 @@ jobs:
 
     - name: Build
       run: |
-        pyinstaller --onefile --exclude-module pygit2 --name build --distpath . release.py
+        pyinstaller --onefile --exclude-module pygit2 --name build --distpath dist release.py
       working-directory: ${{github.workspace}}/archive
+
+    - name: Move Build
+      shell: bash
+      run: |
+        mv dist/* archive/
+        rm archive/*.spec
+      working-directory: ${{github.workspace}}
 
     - name: Archive
       uses: thedoctor0/zip-release@master
