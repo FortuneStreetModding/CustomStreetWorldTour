@@ -23,11 +23,6 @@ jobs:
       run: |
         pip3 install pyinstaller --disable-pip-version-check
 
-    - name: Build
-      run: |
-        pyinstaller --onefile --exclude-module pygit2 --name build release.py
-      working-directory: ${{github.workspace}}
-
     - name: Move files
       shell: bash
       run: |
@@ -47,8 +42,12 @@ jobs:
         mv *.yaml archive/
         mv *.yml archive/
         mv *.txt archive/
-        mv build archive/
       working-directory: ${{github.workspace}}
+
+    - name: Build
+      run: |
+        pyinstaller --onefile --exclude-module pygit2 --name build --distpath . release.py
+      working-directory: ${{github.workspace}}/archive
 
     - name: Archive
       uses: thedoctor0/zip-release@master
@@ -81,11 +80,6 @@ jobs:
       run: |
         pip install pyinstaller --disable-pip-version-check
 
-    - name: Build
-      run: |
-        pyinstaller --onefile --exclude-module pygit2 --name build release.py
-      working-directory: ${{github.workspace}}
-
     - name: Move files
       shell: bash
       run: |
@@ -105,8 +99,12 @@ jobs:
         mv *.yaml archive/
         mv *.yml archive/
         mv *.txt archive/
-        mv build.exe archive/
       working-directory: ${{github.workspace}}
+
+    - name: Build
+      run: |
+        pyinstaller --onefile --exclude-module pygit2 --name build --distpath . release.py
+      working-directory: ${{github.workspace}}/archive
 
     - name: Archive
       uses: thedoctor0/zip-release@master
