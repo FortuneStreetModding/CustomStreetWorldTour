@@ -19,28 +19,43 @@ jobs:
       with:
         submodules: true
 
-    - name: Prepare
-      shell: bash
-      run: |
-        cp ./release/* .
-        rm fortunestreetmodding.github.io/_maps/*/*.webp
-        rm *.webp
-        rm *.md
-      working-directory: ${{github.workspace}}
-
     - name: Install pyinstaller
       run: |
-        pip install pyinstaller
+        pip3 install pyinstaller --disable-pip-version-check
 
     - name: Build
       run: |
         pyinstaller --onefile --exclude-module pygit2 --name build release.py
       working-directory: ${{github.workspace}}
 
-    - name: Archive
+    - name: Move files
+      shell: bash
       run: |
-        zip -r -v CustomStreetWorldTour-${VERSION_NAME}-macos.zip files/ patches/ fortunestreetmodding.github.io/_maps/ fortunestreetmodding.github.io/_data/backgrounds.yml *.ttf *.sh *.bat *.yaml *.yml *.txt build
+        rm fortunestreetmodding.github.io/_maps/*/*.webp
+        rm *.webp
+        rm *.md
+        mkdir archive
+        mkdir archive/fortunestreetmodding.github.io
+        mv fortunestreetmodding.github.io/_maps archive/fortunestreetmodding.github.io/
+        mkdir archive/fortunestreetmodding.github.io/_data
+        mv fortunestreetmodding.github.io/_data/backgrounds.yml archive/fortunestreetmodding.github.io/_data/
+        mv files archive/
+        mv patches archive/
+        mv release/* archive/
+        mv *.ttf archive/
+        mv *.bat archive/
+        mv *.yaml archive/
+        mv *.yml archive/
+        mv *.txt archive/
+        mv build archive/
       working-directory: ${{github.workspace}}
+
+    - name: Archive
+      uses: thedoctor0/zip-release@master
+      with:
+        type: 'zip'
+        directory: ${{github.workspace}}/archive
+        filename: ../CustomStreetWorldTour-${{github.event.release.tag_name}}-macos.zip
 
     - name: Release
       uses: softprops/action-gh-release@v1
@@ -62,28 +77,43 @@ jobs:
       with:
         submodules: true
 
-    - name: Prepare
-      shell: bash
-      run: |
-        cp ./release/* .
-        rm fortunestreetmodding.github.io/_maps/*/*.webp
-        rm *.webp
-        rm *.md
-      working-directory: ${{github.workspace}}
-
     - name: Install pyinstaller
       run: |
-        pip install pyinstaller
+        pip install pyinstaller --disable-pip-version-check
 
     - name: Build
       run: |
         pyinstaller --onefile --exclude-module pygit2 --name build release.py
       working-directory: ${{github.workspace}}
 
-    - name: Archive
+    - name: Move files
+      shell: bash
       run: |
-        zip -r -v CustomStreetWorldTour-${VERSION_NAME}-windows.zip files/ patches/ fortunestreetmodding.github.io/_maps/ fortunestreetmodding.github.io/_data/backgrounds.yml *.ttf *.sh *.bat *.yaml *.yml *.txt build.exe
+        rm fortunestreetmodding.github.io/_maps/*/*.webp
+        rm *.webp
+        rm *.md
+        mkdir archive
+        mkdir archive/fortunestreetmodding.github.io
+        mv fortunestreetmodding.github.io/_maps archive/fortunestreetmodding.github.io/
+        mkdir archive/fortunestreetmodding.github.io/_data
+        mv fortunestreetmodding.github.io/_data/backgrounds.yml archive/fortunestreetmodding.github.io/_data/
+        mv files archive/
+        mv patches archive/
+        mv release/* archive/
+        mv *.ttf archive/
+        mv *.bat archive/
+        mv *.yaml archive/
+        mv *.yml archive/
+        mv *.txt archive/
+        mv build.exe archive/
       working-directory: ${{github.workspace}}
+
+    - name: Archive
+      uses: thedoctor0/zip-release@master
+      with:
+        type: 'zip'
+        directory: ${{github.workspace}}/archive
+        filename: ../CustomStreetWorldTour-${{github.event.release.tag_name}}-windows.zip
 
     - name: Release
       uses: softprops/action-gh-release@v1
@@ -113,6 +143,13 @@ jobs:
         rm *.md
         zip -r -v CustomStreetWorldTour-${VERSION_NAME}.zip files/ patches/ fortunestreetmodding.github.io/_maps/ fortunestreetmodding.github.io/_data/backgrounds.yml *.ttf *.sh *.bat *.py *.yaml *.yml *.txt
       working-directory: ${{github.workspace}}
+
+    - name: Archive
+      uses: thedoctor0/zip-release@master
+      with:
+        type: 'zip'
+        directory: ${{github.workspace}}/archive
+        filename: ../csmm-${{github.event.release.tag_name}}-windows.zip
 
     - name: Release
       uses: softprops/action-gh-release@v1
