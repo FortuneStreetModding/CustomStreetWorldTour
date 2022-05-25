@@ -9,3 +9,6 @@ Dolphin*/
 dolphin*/
 *.pyc
 resources/
+build/
+dist/
+*spec

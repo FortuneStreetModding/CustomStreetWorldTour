@@ -8,9 +8,6 @@ on:
       - 'release/**'
   workflow_dispatch:
 
-env:
-  VERSION_NAME: ${{ github.event.release.tag_name }}
-
 jobs:
   macos:
     runs-on: macos-11
@@ -21,12 +18,6 @@ jobs:
     - uses: actions/setup-python@v3
       with:
         python-version: '3.10'
-
-    - name: Move release files
-      shell: bash
-      run: |
-        mv release/* ./
-      working-directory: ${{github.workspace}}
 
     - name: Install pyinstaller and requirements
       run: |
@@ -82,12 +73,6 @@ jobs:
       with:
         python-version: '3.10'
 
-    - name: Move release files
-      shell: bash
-      run: |
-        mv release/* ./
-      working-directory: ${{github.workspace}}
-
     - name: Install pyinstaller and requirements
       run: |
         pip install pyinstaller -r requirements.txt --disable-pip-version-check
@@ -131,10 +116,3 @@ jobs:
         name: zip-file
         path: |
           ${{github.workspace}}/CustomStreetWorldTour-${{github.event.release.tag_name}}-windows.zip
-
-  python:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        submodules: true

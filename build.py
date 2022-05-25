@@ -98,6 +98,8 @@ def findExecutable(executable : str, downloadUrl : str = "", searchPath : Path =
     candidates = list(Path().glob('**/' + executable + EXECUTABLE_EXTENSION))
     if platform.system() == 'Darwin' and executable == 'csmm':
         candidates.append('/Applications/csmm.app/Contents/MacOS/csmm')
+    if version and not versionMatch:
+        versionMatch = version
     for candidate in candidates:
         try:
             candidate = str(candidate)
