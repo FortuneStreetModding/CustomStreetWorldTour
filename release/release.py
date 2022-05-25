@@ -2,6 +2,7 @@ import build
 import sys
 import argparse
 import colorama
+import platform
 
 output_version = "1.0"
 csmm_version = "1.7.5"
@@ -12,7 +13,13 @@ threads = 1
 
 if __name__ == "__main__":
     if len(sys.argv) <= 1:
-        print("This file should not be run directly.")
+        if platform.system() == "Windows":
+            file = "build.bat"
+            file_console = "build_console.bat"
+        else:
+            file = "build.sh"
+            file_console = "build_console.sh"
+        print("This file should not be run directly. Run {file} or {file_console} instead.")
         input("Press enter to continue...")
         sys.exit(1)
 
