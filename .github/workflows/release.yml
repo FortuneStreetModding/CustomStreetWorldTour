@@ -31,6 +31,7 @@ jobs:
 
     - name: Build
       run: |
+        pip3 install -r requirements.txt
         pyinstaller --onefile --exclude-module pygit2 --name build --distpath dist release.py
       working-directory: ${{github.workspace}}
 
@@ -88,6 +89,7 @@ jobs:
 
     - name: Build
       run: |
+        pip install -r requirements.txt
         pyinstaller --onefile --exclude-module pygit2 --name build --distpath dist release.py
       working-directory: ${{github.workspace}}
 
