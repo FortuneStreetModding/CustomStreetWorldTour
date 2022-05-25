@@ -19,15 +19,15 @@ jobs:
       with:
         submodules: true
 
-    - name: Install pyinstaller
-      run: |
-        pip3 install pyinstaller --disable-pip-version-check
-
     - name: Move release files
       shell: bash
       run: |
         mv release/* ./
       working-directory: ${{github.workspace}}
+
+    - name: Install pyinstaller and requirements
+      run: |
+        pip3 install pyinstaller -r requirements.txt --disable-pip-version-check
 
     - name: Build
       run: |
@@ -77,15 +77,15 @@ jobs:
       with:
         submodules: true
 
-    - name: Install pyinstaller
-      run: |
-        pip install pyinstaller --disable-pip-version-check
-
     - name: Move release files
       shell: bash
       run: |
         mv release/* ./
       working-directory: ${{github.workspace}}
+
+    - name: Install pyinstaller and requirements
+      run: |
+        pip install pyinstaller -r requirements.txt --disable-pip-version-check
 
     - name: Build
       run: |
