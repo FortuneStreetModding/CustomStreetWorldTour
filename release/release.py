@@ -13,6 +13,7 @@ threads = 1
 
 if __name__ == "__main__":
     colorama.init()
+
     input_str = input("Enter the build mode and press enter (c = console, d = default):")
 
     if 'c' in input_str.lower():
@@ -24,7 +25,7 @@ if __name__ == "__main__":
         print("-- Using default build mode --")
         print()
     else:
-        print("Invalid input, exitting...")
+        print("Invalid input, exiting...")
         input("Press enter to continue...")
         sys.exit(1)
 
