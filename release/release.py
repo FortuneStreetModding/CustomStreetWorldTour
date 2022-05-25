@@ -13,13 +13,13 @@ threads = 1
 
 if __name__ == "__main__":
     colorama.init()
-    input = input("Enter the build mode and press enter (c = console, d = default):")
+    input_str = input("Enter the build mode and press enter (c = console, d = default):")
 
-    if 'c' in input.lower():
+    if 'c' in input_str.lower():
         boards_list_file = "CustomStreetWorldTour_console.yaml"
         print("-- Using console build mode --")
         print()
-    elif 'd' in input.lower():
+    elif 'd' in input_str.lower():
         boards_list_file = "CustomStreetWorldTour.yaml"
         print("-- Using default build mode --")
         print()
