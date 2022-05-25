@@ -25,7 +25,7 @@ if __name__ == "__main__":
         print("-- Using default build mode --")
         print()
     else:
-        print("Invalid input, exiting...")
+        print("Invalid input, exiting.")
         input("Press enter to continue...")
         sys.exit(1)
 
