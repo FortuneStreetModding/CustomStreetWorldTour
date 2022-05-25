@@ -28,8 +28,16 @@ if __name__ == "__main__":
         input("Press enter to continue...")
         sys.exit(1)
 
+    # find out the application directory
+    if getattr(sys, 'frozen', False):
+        # we are running in a bundle
+        application_path = sys._MEIPASS
+    else:
+        # we are running in a normal Python environment
+        application_path = os.path.dirname(os.path.abspath(__file__))
+
     try:
-        os.chdir(os.path.dirname(os.path.realpath(__file__)))
+        os.chdir(application_path)
         build.run(None, output_version, csmm_version, resources_url, overwrite_extracted_directory, boards_list_file, threads)
         input("Press enter to continue...")
     except Exception as e:
