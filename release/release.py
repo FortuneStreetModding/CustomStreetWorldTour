@@ -1,8 +1,7 @@
 import build
 import sys
-import argparse
 import colorama
-import platform
+import os
 
 output_version = "1.0"
 csmm_version = "1.7.5"
@@ -30,6 +29,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     try:
+        os.chdir(os.path.dirname(os.path.realpath(__file__)))
         build.run(None, output_version, csmm_version, resources_url, overwrite_extracted_directory, boards_list_file, threads)
         input("Press enter to continue...")
     except Exception as e:

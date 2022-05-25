@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import shutil
 import sys
-MIN_PYTHON = (3, 9)
+MIN_PYTHON = (3, 10)
 if sys.version_info < MIN_PYTHON:
     sys.exit("Python %s.%s or later is required.\n" % MIN_PYTHON)
 
@@ -87,7 +87,7 @@ def downloadReleaseFromGithub(executable : str, url : str, version : str):
                 gdown.extractall(zipFileDownload, Path())
                 os.remove(zipFileDownload)
 
-def findExecutable(executable : str, downloadUrl : str = "", searchPath : Path = None, version : str = None) -> str:
+def findExecutable(executable : str, downloadUrl : str = "", searchPath : Path = None, version : str = None, versionMatch : str = None) -> str:
     if searchPath:
         candidate = f'{str(searchPath.as_posix())}/{executable}{EXECUTABLE_EXTENSION}'
         try:
@@ -100,13 +100,13 @@ def findExecutable(executable : str, downloadUrl : str = "", searchPath : Path =
         candidates.append('/Applications/csmm.app/Contents/MacOS/csmm')
     for candidate in candidates:
         try:
-            #print(candidate)
             candidate = str(candidate)
             help_output = check_output([candidate, '--help'], encoding="utf-8")
-            if not version or version in help_output:
+            if not version:
                 return candidate
-        except OSError as e:
-            #print(e)
+            elif versionMatch in help_output:
+                return candidate
+        except OSError:
             pass
     if downloadUrl:
         if 'github' in downloadUrl:
@@ -117,7 +117,7 @@ def findExecutable(executable : str, downloadUrl : str = "", searchPath : Path =
                 cprint(f'Failed downloading {executable}: {str(err)}', 'red')
         else:
             raise NotImplementedError
-    return ""
+    raise FileNotFoundError(f"Could not find {executable}")
 
 def config_update_file_size(config : configparser.ConfigParser, section : str, file_size : int):
     config[section] = {'file.size': file_size}
@@ -258,20 +258,18 @@ def getInputFortuneStreetFilePath(input_file : str, wit : str) -> Path:
         if len(validCandidates) == 0:
             validCandidates = getValidCandidates(wit, Path(".."))
         if len(validCandidates) == 0:
-            print("Provide the path to the Fortune Street iso/wbfs file or put such a file into the same directory as this script")
-            sys.exit()
+            raise FileNotFoundError("Provide the path to the Fortune Street iso/wbfs file or put such a file into the same directory as this script")
         elif len(validCandidates) == 1:
             file = Path(validCandidates[0].filePath)
             print(f'Using {file} as input')
             return file
         else:
-            print("There are multiple Fortune Street iso/wbfs in this directory. Either remove them so that only one remains or provide the path to the Fortune Street iso/wbfs file")
-            sys.exit()
+            raise RuntimeError("There are multiple Fortune Street iso/wbfs in this directory. Either remove them so that only one remains or provide the path to the Fortune Street iso/wbfs file")
+            
     else:
         file = Path(input_file)
         if not file.is_file():
-            print(f'{input_file} does not exist or is not a file')
-            sys.exit()
+            raise FileNotFoundError(f'{input_file} does not exist or is not a file')
         return file
 
 def downloadBackgroundAndMusic(yamlMap : Path, backgrounds : dict, resourcesDirectory : str):
@@ -552,12 +550,11 @@ def run(input_file: str, output_version: str, csmm_version: str, resources_mirro
         print(f"Fetching CSMM {csmm_version}...")
     else:
         print(f"Fetching CSMM")
-    csmm = findExecutable("csmm", downloadUrl=DOWNLOAD_URL_CSMM, version=csmm_version)
+    csmm = findExecutable("csmm", downloadUrl=DOWNLOAD_URL_CSMM, version=csmm_version, versionMatch=f'Custom Street Map Manager {csmm_version}')
     if csmm:
         print(f'csmm: {Path(csmm).absolute().as_posix()}')
     else:
-        print("Could not find csmm executable")
-        sys.exit()
+        raise FileNotFoundError("Could not find csmm executable")
 
     print(f"Fetching CSMM required tools...")
     output = check_output([csmm, 'download-tools', '--force'], encoding="utf-8")
@@ -566,27 +563,15 @@ def run(input_file: str, output_version: str, csmm_version: str, resources_mirro
 
     print(f"wit: ", end='')
     wit = findExecutable("wit", searchPath=searchPath)
-    if wit:
-        print(Path(wit).absolute().as_posix())
-    else:
-        print("Could not find wit executable")
-        sys.exit()
+    print(Path(wit).absolute().as_posix())
 
     print(f"wszst: ", end='')
     wszst = findExecutable("wszst", searchPath=searchPath)
-    if wszst:
-        print(Path(wszst).absolute().as_posix())
-    else:
-        print("Could not find wszst executable")
-        sys.exit()
+    print(Path(wszst).absolute().as_posix())
 
     print(f"wimgt: ", end='')
     wimgt = findExecutable("wimgt", searchPath=searchPath)
-    if wimgt:
-        print(Path(wimgt).absolute().as_posix())
-    else:
-        print("Could not find wimgt executable")
-        sys.exit()
+    print(Path(wimgt).absolute().as_posix())
 
     if output_version:
         version = output_version
@@ -648,11 +633,11 @@ def run(input_file: str, output_version: str, csmm_version: str, resources_mirro
 
     print(f'Saving {str(len(mapList))} maps to {file.stem}...')
     output = check_output([csmm, 'save', '--addAuthorToDescription', '1', file.stem], encoding="utf-8")
-    print(output)
 
     if 'error' in output.lower():
-        sys.exit(1)
+        raise FileNotFoundError(output)
 
+    print(output)
     print(f'Applying hex edits to main.dol...')
     applyHexEdits(Path(Path(file.stem) / Path("sys/main.dol")))
 
@@ -684,10 +669,10 @@ if __name__ == "__main__":
     parser.add_argument('--boards-list-file', default="CustomStreetWorldTour.yaml", action='store', help='The yaml file which contains the boards that should be used')
     parser.add_argument('--threads', default="4", type=int, action='store', help='The yaml file which contains the boards that should be used')
     args = parser.parse_args()
-    run(args.input_file, 
-        args.csmm_version, 
-        args.output_version, 
-        args.resources_mirror, 
-        args.overwrite_extracted_directory, 
+    run(args.input_file,
+        args.output_version,
+        args.csmm_version,
+        args.resources_mirror,
+        args.overwrite_extracted_directory,
         args.boards_list_file,
         args.threads)
