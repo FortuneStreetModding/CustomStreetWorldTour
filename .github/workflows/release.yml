@@ -48,7 +48,7 @@ jobs:
         mv fortunestreetmodding.github.io/_data/backgrounds.yml archive/fortunestreetmodding.github.io/_data/
         mv files archive/
         mv patches archive/
-        mv *.ttf *.sh *.yaml *.yml archive/ || true
+        mv *.ttf *.yaml *.yml archive/ || true
         mv dist/* archive/
       working-directory: ${{github.workspace}}
 
@@ -108,7 +108,7 @@ jobs:
         mv fortunestreetmodding.github.io/_data/backgrounds.yml archive/fortunestreetmodding.github.io/_data/
         mv files archive/
         mv patches archive/
-        mv *.ttf *.bat *.yaml *.yml archive/ || true
+        mv *.ttf *.yaml *.yml archive/ || true
         mv dist/* archive/
       working-directory: ${{github.workspace}}
 

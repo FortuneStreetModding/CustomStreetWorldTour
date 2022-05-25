@@ -12,20 +12,26 @@ overwrite_extracted_directory = True
 threads = 1
 
 if __name__ == "__main__":
-    if len(sys.argv) <= 1:
-        if platform.system() == "Windows":
-            file = "build.bat"
-            file_console = "build_console.bat"
-        else:
-            file = "build.sh"
-            file_console = "build_console.sh"
-        print("This file should not be run directly. Run {file} or {file_console} instead.")
+    colorama.init()
+    input = input("Enter the build mode and press enter (c = console, d = default):")
+
+    if 'c' in input.lower():
+        boards_list_file = "CustomStreetWorldTour_console.yaml"
+        print("-- Using console build mode --")
+        print()
+    elif 'd' in input.lower():
+        boards_list_file = "CustomStreetWorldTour.yaml"
+        print("-- Using default build mode --")
+        print()
+    else:
+        print("Invalid input, exitting...")
         input("Press enter to continue...")
         sys.exit(1)
 
-    colorama.init()
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--input-file', action='store', help='The input image of either Fortune Street or Boom Street in wbfs or iso format')
-    parser.add_argument('--boards-list-file', action='store', help='The yaml file which contains the boards that should be used')
-    args = parser.parse_args()
-    build.run(args.input_file, output_version, csmm_version, resources_url, overwrite_extracted_directory, args.boards_list_file, threads)
+    try:
+        build.run(None, output_version, csmm_version, resources_url, overwrite_extracted_directory, boards_list_file, threads)
+        input("Press enter to continue...")
+    except Exception as e:
+        print(str(e))
+        input("Press enter to continue...")
+        sys.exit(1)
