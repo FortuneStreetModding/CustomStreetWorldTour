@@ -38,7 +38,6 @@ IF ERRORLEVEL 1 (
 git clone --depth=1 --shallow-submodules --recurse-submodules="fortunestreetmodding.github.io" https://github.com/FortuneStreetModding/CustomStreetWorldTour.git --branch master
 python -m pip install --requirement CustomStreetWorldTour/requirements.txt --user
 IF ERRORLEVEL 0 (
-    powershell "$s=(New-Object -COM WScript.Shell).CreateShortcut('build.lnk');$s.TargetPath=(Get-Item .).FullName+'\CustomStreetWorldTour\build.bat';$s.WorkingDirectory=(Get-Item .).FullName+'\CustomStreetWorldTour';$s.Save()"
     ECHO ==================================
     ECHO Setup finished and ready to build!
     ECHO   You can now run the build.bat
