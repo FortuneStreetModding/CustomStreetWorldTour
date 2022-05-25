@@ -256,15 +256,13 @@ def getInputFortuneStreetFilePath(input_file : str, wit : str) -> Path:
     if not input_file:
         validCandidates = getValidCandidates(wit, Path("."))
         if len(validCandidates) == 0:
-            validCandidates = getValidCandidates(wit, Path(".."))
-        if len(validCandidates) == 0:
-            raise FileNotFoundError("Provide the path to the Fortune Street iso/wbfs file or put such a file into the same directory as this script")
+            raise FileNotFoundError("Put a Fortune Street iso/wbfs file into the same directory as this script")
         elif len(validCandidates) == 1:
             file = Path(validCandidates[0].filePath)
             print(f'Using {file} as input')
             return file
         else:
-            raise RuntimeError("There are multiple Fortune Street iso/wbfs in this directory. Either remove them so that only one remains or provide the path to the Fortune Street iso/wbfs file")
+            raise RuntimeError("There are multiple Fortune Street iso/wbfs in this directory. Remove them so that only one remains.")
             
     else:
         file = Path(input_file)
