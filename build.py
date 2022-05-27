@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import shutil
 import sys
-MIN_PYTHON = (3, 9)
+MIN_PYTHON = (3, 10)
 if sys.version_info < MIN_PYTHON:
     sys.exit("Python %s.%s or later is required.\n" % MIN_PYTHON)
 
@@ -87,7 +87,7 @@ def downloadReleaseFromGithub(executable : str, url : str, version : str):
                 gdown.extractall(zipFileDownload, Path())
                 os.remove(zipFileDownload)
 
-def findExecutable(executable : str, downloadUrl : str = "", searchPath : Path = None, version : str = None) -> str:
+def findExecutable(executable : str, downloadUrl : str = "", searchPath : Path = None, version : str = None, versionMatch : str = None) -> str:
     if searchPath:
         candidate = f'{str(searchPath.as_posix())}/{executable}{EXECUTABLE_EXTENSION}'
         try:
@@ -98,15 +98,17 @@ def findExecutable(executable : str, downloadUrl : str = "", searchPath : Path =
     candidates = list(Path().glob('**/' + executable + EXECUTABLE_EXTENSION))
     if platform.system() == 'Darwin' and executable == 'csmm':
         candidates.append('/Applications/csmm.app/Contents/MacOS/csmm')
+    if version and not versionMatch:
+        versionMatch = version
     for candidate in candidates:
         try:
-            #print(candidate)
             candidate = str(candidate)
             help_output = check_output([candidate, '--help'], encoding="utf-8")
-            if not version or version in help_output:
+            if not version:
                 return candidate
-        except OSError as e:
-            #print(e)
+            elif versionMatch in help_output:
+                return candidate
+        except OSError:
             pass
     if downloadUrl:
         if 'github' in downloadUrl:
@@ -117,7 +119,7 @@ def findExecutable(executable : str, downloadUrl : str = "", searchPath : Path =
                 cprint(f'Failed downloading {executable}: {str(err)}', 'red')
         else:
             raise NotImplementedError
-    return ""
+    raise FileNotFoundError(f"Could not find {executable}")
 
 def config_update_file_size(config : configparser.ConfigParser, section : str, file_size : int):
     config[section] = {'file.size': file_size}
@@ -256,22 +258,18 @@ def getInputFortuneStreetFilePath(input_file : str, wit : str) -> Path:
     if not input_file:
         validCandidates = getValidCandidates(wit, Path("."))
         if len(validCandidates) == 0:
-            validCandidates = getValidCandidates(wit, Path(".."))
-        if len(validCandidates) == 0:
-            print("Provide the path to the Fortune Street iso/wbfs file or put such a file into the same directory as this script")
-            sys.exit()
+            raise FileNotFoundError("Put a Fortune Street iso/wbfs file into the same directory as this script")
         elif len(validCandidates) == 1:
             file = Path(validCandidates[0].filePath)
             print(f'Using {file} as input')
             return file
         else:
-            print("There are multiple Fortune Street iso/wbfs in this directory. Either remove them so that only one remains or provide the path to the Fortune Street iso/wbfs file")
-            sys.exit()
+            raise RuntimeError("There are multiple Fortune Street iso/wbfs in this directory. Remove them so that only one remains.")
+            
     else:
         file = Path(input_file)
         if not file.is_file():
-            print(f'{input_file} does not exist or is not a file')
-            sys.exit()
+            raise FileNotFoundError(f'{input_file} does not exist or is not a file')
         return file
 
 def downloadBackgroundAndMusic(yamlMap : Path, backgrounds : dict, resourcesDirectory : str):
@@ -369,14 +367,13 @@ def downloadBackgroundAndMusic(yamlMap : Path, backgrounds : dict, resourcesDire
         except yaml.YAMLError as exc:
             print(exc)
 
-def downloadBackgroundsAndMusic(yamlMaps : list[Path], resourcesDirectory : str = None):
+def downloadBackgroundsAndMusic(yamlMaps : list[Path], resourcesDirectory : str = None, threads: int = 4):
     backgrounds = dict()
     with open('fortunestreetmodding.github.io/_data/backgrounds.yml', "r", encoding='utf8') as stream:
         try:
             backgrounds = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
             print(exc)
-    threads = 4
     if threads == 1:
         for yamlMap in yamlMaps:
             downloadBackgroundAndMusic(yamlMap, backgrounds, resourcesDirectory)
@@ -548,28 +545,16 @@ def applyHexEdits(mainDol : str):
                     stream.write(struct.pack(format, patchValue))
                 print(f'  {hex(fileAddress)}: {originalValue} -> {patchValue}')
 
-def main(argv : list):
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--input-file', action='store', help='The input image of either Fortune Street or Boom Street in wbfs or iso format')
-    parser.add_argument('--csmm-version', action='store', help='CSMM version to use')
-    parser.add_argument('--output-version', action='store', help='Output CSWT version')
-    parser.add_argument('--resources-mirror', action='append', help='Specify a download URL where this script will download all required resources')
-    parser.add_argument('--overwrite-extracted-directory', action='store_true', help='Avoids reusing an old extracted directory which can be a cause for errors')
-    parser.add_argument('--boards-list-file', default="CustomStreetWorldTour.yaml", action='store', help='The yaml file which contains the boards that should be used')
-    args = parser.parse_args(argv)
-
-    colorama.init()
-
-    if args.csmm_version:
-        print(f"Fetching CSMM {args.csmm_version}...")
+def run(input_file: str, output_version: str, csmm_version: str, resources_mirror: list[str], overwrite_extracted_directory: bool, boards_list_file: str, threads: int):
+    if csmm_version:
+        print(f"Fetching CSMM {csmm_version}...")
     else:
         print(f"Fetching CSMM")
-    csmm = findExecutable("csmm", downloadUrl=DOWNLOAD_URL_CSMM, version=args.csmm_version)
+    csmm = findExecutable("csmm", downloadUrl=DOWNLOAD_URL_CSMM, version=csmm_version, versionMatch=f'Custom Street Map Manager {csmm_version}')
     if csmm:
         print(f'csmm: {Path(csmm).absolute().as_posix()}')
     else:
-        print("Could not find csmm executable")
-        sys.exit()
+        raise FileNotFoundError("Could not find csmm executable")
 
     print(f"Fetching CSMM required tools...")
     output = check_output([csmm, 'download-tools', '--force'], encoding="utf-8")
@@ -578,33 +563,20 @@ def main(argv : list):
 
     print(f"wit: ", end='')
     wit = findExecutable("wit", searchPath=searchPath)
-    if wit:
-        print(Path(wit).absolute().as_posix())
-    else:
-        print("Could not find wit executable")
-        sys.exit()
+    print(Path(wit).absolute().as_posix())
 
     print(f"wszst: ", end='')
     wszst = findExecutable("wszst", searchPath=searchPath)
-    if wszst:
-        print(Path(wszst).absolute().as_posix())
-    else:
-        print("Could not find wszst executable")
-        sys.exit()
+    print(Path(wszst).absolute().as_posix())
 
     print(f"wimgt: ", end='')
     wimgt = findExecutable("wimgt", searchPath=searchPath)
-    if wimgt:
-        print(Path(wimgt).absolute().as_posix())
-    else:
-        print("Could not find wimgt executable")
-        sys.exit()
+    print(Path(wimgt).absolute().as_posix())
 
-    if args.output_version:
-        version = args.output_version
+    if output_version:
+        version = output_version
     else:
         import pygit2
-        from pygit2 import GitError
         try:
             repo = pygit2.Repository('.git')
             head = repo.revparse_single('HEAD')
@@ -616,13 +588,13 @@ def main(argv : list):
                         version = ref.replace("refs/tags/", "")
                         break
             print(f'Using version {version}')
-        except GitError as err:
+        except pygit2.GitError as err:
             version = None
             print(f'Unable to determine version: {err.args[0]}')
 
-    file = getInputFortuneStreetFilePath(args.input_file, wit)
+    file = getInputFortuneStreetFilePath(input_file, wit)
 
-    if Path(file.stem).is_dir() and Path(file.stem).exists() and args.overwrite_extracted_directory:
+    if Path(file.stem).is_dir() and Path(file.stem).exists() and overwrite_extracted_directory:
         print(f'Deleting the folder {Path(file.stem).as_posix()}...')
         shutil.rmtree(Path(file.stem))
 
@@ -636,22 +608,22 @@ def main(argv : list):
     yamlMaps = list(Path().glob('fortunestreetmodding.github.io/_maps/*/*.y*ml'))
 
     # create the csmm_pending_changes.csv file which is required by csmm
-    mapList = createMapListFile(args.boards_list_file, yamlMaps, Path(file.stem + '/csmm_pending_changes.csv'))
+    mapList = createMapListFile(boards_list_file, yamlMaps, Path(file.stem + '/csmm_pending_changes.csv'))
 
     # filter the maps out which are not in the boards_configuration
     yamlMaps = list(filter(lambda yamlMap: yamlMap.parent.name in mapList, yamlMaps))
 
     resources_dir = Path("resources")
-    if args.resources_mirror:
+    if resources_mirror:
         if not resources_dir.exists():
             resources_dir.mkdir()
         if not any(os.scandir(resources_dir)):
             print(f'Downloading resources package...')
-            download(resources_dir, args.resources_mirror)
-        downloadBackgroundsAndMusic(yamlMaps, resources_dir.as_posix())
+            download(resources_dir, resources_mirror)
+        downloadBackgroundsAndMusic(yamlMaps, resources_dir.as_posix(), threads=threads)
         print("All maps checked")
     else:
-        downloadBackgroundsAndMusic(yamlMaps)
+        downloadBackgroundsAndMusic(yamlMaps, threads=threads)
 
     print(f'Patching arc files...')
     patchArcs(file.stem, wszst, wimgt, version)
@@ -661,11 +633,11 @@ def main(argv : list):
 
     print(f'Saving {str(len(mapList))} maps to {file.stem}...')
     output = check_output([csmm, 'save', '--addAuthorToDescription', '1', file.stem], encoding="utf-8")
-    print(output)
 
     if 'error' in output.lower():
-        sys.exit(1)
+        raise FileNotFoundError(output)
 
+    print(output)
     print(f'Applying hex edits to main.dol...')
     applyHexEdits(Path(Path(file.stem) / Path("sys/main.dol")))
 
@@ -687,4 +659,20 @@ def main(argv : list):
         cprint(count*'*', 'green')
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    colorama.init()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input-file', action='store', help='The input image of either Fortune Street or Boom Street in wbfs or iso format')
+    parser.add_argument('--csmm-version', action='store', help='CSMM version to use')
+    parser.add_argument('--output-version', action='store', help='Output CSWT version')
+    parser.add_argument('--resources-mirror', action='append', help='Specify a download URL where this script will download all required resources')
+    parser.add_argument('--overwrite-extracted-directory', action='store_true', help='Avoids reusing an old extracted directory which can be a cause for errors')
+    parser.add_argument('--boards-list-file', default="CustomStreetWorldTour.yaml", action='store', help='The yaml file which contains the boards that should be used')
+    parser.add_argument('--threads', default="4", type=int, action='store', help='The yaml file which contains the boards that should be used')
+    args = parser.parse_args()
+    run(args.input_file,
+        args.output_version,
+        args.csmm_version,
+        args.resources_mirror,
+        args.overwrite_extracted_directory,
+        args.boards_list_file,
+        args.threads)
