@@ -5,8 +5,7 @@ MIN_PYTHON = (3, 10)
 if sys.version_info < MIN_PYTHON:
     sys.exit("Python %s.%s or later is required.\n" % MIN_PYTHON)
 
-from subprocess import check_output
-from subprocess import CalledProcessError
+import subprocess
 from pathlib import Path
 from dataclasses import dataclass
 from PIL import Image
@@ -91,7 +90,7 @@ def findExecutable(executable : str, downloadUrl : str = "", searchPath : Path =
     if searchPath:
         candidate = f'{str(searchPath.as_posix())}/{executable}{EXECUTABLE_EXTENSION}'
         try:
-            check_output([candidate, '--help'], encoding="utf-8")
+            subprocess.check_output([candidate, '--help'], encoding="utf-8")
             return candidate
         except OSError:
             pass
@@ -103,7 +102,7 @@ def findExecutable(executable : str, downloadUrl : str = "", searchPath : Path =
     for candidate in candidates:
         try:
             candidate = str(candidate)
-            help_output = check_output([candidate, '--help'], encoding="utf-8")
+            help_output = subprocess.check_output([candidate, '--help'], encoding="utf-8")
             if not version:
                 return candidate
             elif versionMatch in help_output:
@@ -229,8 +228,8 @@ def download(path : str, mirrors, label : str = None, config : configparser.Conf
 def getValidCandidates(wit : str, path : Path) -> list[FileTypeInfo]:
     validCandidates = []
     try:
-        output = check_output([wit, 'filetype', path.as_posix(), '--long', '--long', '--ignore-fst'], encoding="utf-8")
-    except CalledProcessError as err:
+        output = subprocess.check_output([wit, 'filetype', path.as_posix(), '--long', '--long', '--ignore-fst'], encoding="utf-8")
+    except subprocess.CalledProcessError as err:
         if err.returncode == 8: # wit returns error code 8 if it doesnt find any wii images at all
             return []
         else:
@@ -464,7 +463,7 @@ def patchArcs(dir : str, wszst : str, wimgt : str, version : str):
             arcsToBePatched[arcPathStr].append(pngPath)
     for arcToBePatched in arcsToBePatched:
         with TemporaryDirectory(prefix="CSWT_", ignore_cleanup_errors=True) as tmpdirname:
-            print(check_output([wszst, 'EXTRACT', arcToBePatched, '--dest', tmpdirname, '--overwrite'], encoding="utf-8"))
+            print(subprocess.check_output([wszst, 'EXTRACT', arcToBePatched, '--dest', tmpdirname, '--overwrite'], encoding="utf-8"))
             for pngPath in arcsToBePatched[arcToBePatched]:
                 pngPath = Path(pngPath)
                 basename_tpl_0 = Path(pngPath.stem)
@@ -475,8 +474,8 @@ def patchArcs(dir : str, wszst : str, wimgt : str, version : str):
                     newPngPath = Path(tmpdirname) / Path(pngPath.name)
                     drawVersionOnTitleImage(pngPath, version, newPngPath)
                     pngPath = newPngPath
-                print(check_output([wimgt, 'ENCODE', pngPath.as_posix(), '--dest', tplPath.as_posix(), '--overwrite'], encoding="utf-8"))
-            print(check_output([wszst, 'CREATE', tmpdirname, '--dest', arcToBePatched, '--overwrite'], encoding="utf-8"))
+                print(subprocess.check_output([wimgt, 'ENCODE', pngPath.as_posix(), '--dest', tplPath.as_posix(), '--overwrite'], encoding="utf-8"))
+            print(subprocess.check_output([wszst, 'CREATE', tmpdirname, '--dest', arcToBePatched, '--overwrite'], encoding="utf-8"))
 
 def patchLocalize(dir : str):
     csvDeltas = list(Path().glob('files/localize/*.csv'))
@@ -557,7 +556,7 @@ def run(input_file: str, output_version: str, csmm_version: str, resources_mirro
         raise FileNotFoundError("Could not find csmm executable")
 
     print(f"Fetching CSMM required tools...")
-    output = check_output([csmm, 'download-tools', '--force'], encoding="utf-8")
+    output = subprocess.check_output([csmm, 'download-tools', '--force'], encoding="utf-8")
     print(output)
     searchPath = Path(fetchLastLineOfString(output))
 
@@ -602,7 +601,7 @@ def run(input_file: str, output_version: str, csmm_version: str, resources_mirro
         print(f'Would extract {str(file)} to {file.stem} but it already exists. The directory is reused.')
     else:
         print(f'Extracting {str(file)} to {file.stem}...')
-        check_output([csmm, 'extract', str(file), file.stem], encoding="utf-8")
+        subprocess.check_output([csmm, 'extract', str(file), file.stem], encoding="utf-8")
 
     # glob all yaml files in the maps directory
     yamlMaps = list(Path().glob('fortunestreetmodding.github.io/_maps/*/*.y*ml'))
@@ -632,7 +631,7 @@ def run(input_file: str, output_version: str, csmm_version: str, resources_mirro
     patchLocalize(file.stem)
 
     print(f'Saving {str(len(mapList))} maps to {file.stem}...')
-    output = check_output([csmm, 'save', '--addAuthorToDescription', '1', file.stem], encoding="utf-8")
+    output = subprocess.check_output([csmm, 'save', file.stem], encoding="utf-8")
 
     if 'error' in output.lower():
         raise FileNotFoundError(output)
@@ -646,7 +645,7 @@ def run(input_file: str, output_version: str, csmm_version: str, resources_mirro
     else:
         outputFile = Path(file.parent) / Path(f"CustomStreetWorldTour.wbfs")
     print(f'Packing {file.stem} to {outputFile}...')
-    msg = check_output([csmm, 'pack', file.stem, outputFile.as_posix(), '--force'], encoding="utf-8")
+    msg = subprocess.check_output([csmm, 'pack', file.stem, outputFile.as_posix(), '--force'], encoding="utf-8")
     print(msg)
 
     # dirty hack to check if the packing has been successful
@@ -665,7 +664,7 @@ if __name__ == "__main__":
     parser.add_argument('--csmm-version', action='store', help='CSMM version to use')
     parser.add_argument('--output-version', action='store', help='Output CSWT version')
     parser.add_argument('--resources-mirror', action='append', help='Specify a download URL where this script will download all required resources')
-    parser.add_argument('--overwrite-extracted-directory', action='store_true', help='Avoids reusing an old extracted directory which can be a cause for errors')
+    parser.add_argument('--overwrite-extracted-directory', action=argparse.BooleanOptionalAction, default=True, help='Avoids reusing an old extracted directory which can be a cause for errors')
     parser.add_argument('--boards-list-file', default="CustomStreetWorldTour.yaml", action='store', help='The yaml file which contains the boards that should be used')
     parser.add_argument('--threads', default="4", type=int, action='store', help='The yaml file which contains the boards that should be used')
     args = parser.parse_args()
