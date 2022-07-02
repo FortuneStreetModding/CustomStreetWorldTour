@@ -35,7 +35,7 @@ The development build contains all the latest boards and changes to CSWT, but it
 5. Select modlist.txt in the folder as the modpack file
 6. Select mapList.yaml in the folder as the map list file
 7. Choose a desination folder/WBFS/ISO and click OK
-8. Wait while CSMM downloads all the maps, music and backgrounds and packages them into a game. The first time installation can take a while depending on your internet speeds.
+8. Wait while CSMM downloads all the maps, music and backgrounds and packages them into a game. The first time installation can take a while depending on your internet speeds
 9. Enjoy!
 
 #### [For any questions or feedback, please visit our Discord.](https://discord.gg/DE9Hn7T)
