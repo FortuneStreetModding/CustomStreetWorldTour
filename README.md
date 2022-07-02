@@ -22,27 +22,20 @@ This is a tested and stable release with 135 new boards, as well as the inclusio
 
 ## Latest Development Build
 
-The development build contains all the latest boards and changes to CSWT, but it is not as thoroughly tested as the stable releases and lacks support for playing on console. See below for downloads and installation instructions.
+The development build contains all the latest boards and changes to CSWT, but it is not as thoroughly tested as the stable releases and lacks support for playing on console.
 
-### For General Users
+#### [Download Latest Development Build](https://nikkums.io/cswt/Builds/cswtpycsmm-dev.zip)
 
-1. Download [setup.bat](Setup/setup.bat) (Windows) or [setup.sh](Setup/setup.sh) (Unix) (on the page, right click 'Raw' and save linked content)
-2. Put the `setup.bat`/`setup.sh` and a vanilla Fortune Street or Boom Street iso/wbfs into a new empty directory
-3. Run the `setup.bat`/`setup.sh` to set up the needed tools automatically
-4. Run the `CustomStreetWorldTour/build.bat` (Windows) or `CustomStreetWorldTour/build.sh` (Unix) to build Custom Street World Tour
+### Insallation
 
-### For Developers
-
-- You need to have [git](https://git-scm.com/) installed
-- You need to have [python](https://www.python.org/) installed (at least version 3.9)
-  - During installation of python make sure to check the checkbox "Add Python to PATH"
-- You need to have copy of Fortune Street or Boom Street (.iso or .wbfs). This file needs to be in the same directory as this script. Also make sure there is only one original iso/wbfs in this directory.
-
-#### Getting Started for Developers
-
-1. Clone this repository using git. Do not forget to clone submodules as well.
-2. Install the needed python packages using `python -m pip install --requirement requirements.txt`
-3. Put a vanilla Fortune Street or Boom Street (.iso or .wbfs) into the same path. The iso image should also not contain any special characters and no spaces.
-4. Start the `build.bat` (windows) or `build.sh` (unix) file to run the build.
+1. Extract the folder somewhere with a few gigabytes of free storage
+2. Download and open [CSMM 2.5.0 or later](https://github.com/FortuneStreetModding/csmm-qt/releases/latest)
+3. Open 'Quick Setup'
+4. Select an input vanilla game folder/WBFS/ISO
+5. Select modlist.txt in the folder as the modpack file
+6. Select mapList.yaml in the folder as the map list file
+7. Choose a desination folder/WBFS/ISO and click OK
+8. Wait while CSMM downloads all the maps, music and backgrounds and packages them into a game. The first time installation can take a while depending on your internet speeds.
+9. Enjoy!
 
 #### [For any questions or feedback, please visit our Discord.](https://discord.gg/DE9Hn7T)
