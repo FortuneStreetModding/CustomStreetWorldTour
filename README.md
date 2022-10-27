@@ -18,11 +18,11 @@ Custom Street World Tour is an easy-to-install map pack for Fortune Street and B
 
 ### [Version 1.0](https://github.com/FortuneStreetModding/CustomStreetWorldTour/releases/tag/1.0)
 
-This is a tested and stable release with 135 new boards, as well as the inclusion of a console-friendly version.
+This version is somewhat outdated now, and we recommend installing the latest development build below while we prepare the 2.0 release.
 
 ## Latest Development Build
 
-The development build contains all the latest boards and changes to CSWT, but it is not as thoroughly tested as the stable releases and lacks support for playing on console.
+The development build contains all the latest boards and changes to CSWT.
 
 #### [Download Latest Development Build](https://nikkums.io/cswt/Builds/cswtpycsmm-dev.zip)
 
