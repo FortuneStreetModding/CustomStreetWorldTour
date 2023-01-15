@@ -15,15 +15,9 @@ Custom Street World Tour is an easy-to-install map pack for Fortune Street and B
 - All characters unlokced by default.
 - Improved balancing to make three-shop districts more viable and fair.
 
-## Latest Stable Release
-
-### [Version 1.0](https://github.com/FortuneStreetModding/CustomStreetWorldTour/releases/tag/1.0)
-
-This version is somewhat outdated now, and we recommend installing the latest development build below while we prepare the 2.0 release.
-
 ## Latest Development Build
 
-The development build contains all the latest boards and changes to CSWT.
+The development build contains all the latest boards and changes to CSWT. It is currently the only working and supported build.
 
 #### [Download Latest Development Build](https://nikkums.io/cswt/Builds/cswtpycsmm-dev.zip)
 
