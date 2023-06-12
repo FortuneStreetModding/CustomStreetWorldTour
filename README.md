@@ -26,7 +26,7 @@ The development build contains all the latest boards and changes to CSWT. It is 
 - The latest cswtpycsmm-dev.zip from the link above.
 - A clean, original, unmodified ISO/WBFS/Extracted Folder of Fortune Street, Boom Street or Itadaki Street Wii. Nkit files, even ones converted to ISO, will not work.
 - [The latest version of CSMM](https://github.com/FortuneStreetModding/csmm-qt/releases/latest).
-- An emulator of modded console to play it on.
+- An emulator or modded console to play it on.
 - A recommended 10gb of free space on your disk drive.
 
 ### Insallation
