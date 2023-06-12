@@ -21,16 +21,23 @@ The development build contains all the latest boards and changes to CSWT. It is 
 
 #### [Download Latest Development Build](https://nikkums.io/cswt/Builds/cswtpycsmm-dev.zip)
 
+### Requirements
+
+- The latest cswtpycsmm-dev.zip from the link above.
+- A clean, original, unmodified ISO/WBFS/Extracted Folder of Fortune Street, Boom Street or Itadaki Street Wii. Nkit files, even ones converted to ISO, will not work.
+- [The latest version of CSMM](https://github.com/FortuneStreetModding/csmm-qt/releases/latest).
+- An emulator of modded console to play it on.
+- A recommended 10gb of free space on your disk drive.
+
 ### Insallation
 
-1. Extract the folder somewhere with a few gigabytes of free storage
-2. Download and open [CSMM 2.5.0 or later](https://github.com/FortuneStreetModding/csmm-qt/releases/latest)
-3. Open 'Quick Setup'
-4. Select an input vanilla game folder/WBFS/ISO
-5. Select modlist.txt in the folder as the modpack file
-6. Select mapList.yaml in the folder as the map list file
-7. Choose a desination folder/WBFS/ISO and click OK
-8. Wait while CSMM downloads all the maps, music and backgrounds and packages them into a game. The first time installation can take a while depending on your internet speeds
-9. Enjoy!
+1. Open CSMM.
+2. Select 'Quick Setup' in the bottom-right.
+3. Choose an input vanilla game ISO/WBFS/Extracted Folder of Fortune Street / Boom Street / Itadaki Street Wii.
+4. Click 'Choose Modpack .zip' and open the downloaded cswtpycsmm-dev.zip
+5. Adjust other settings as required. Otherwise continue.
+6. Click Export to WBFS/ISO or Export to Extracted Folder.
+7. Wait while CSMM downloads all the maps, music and backgrounds and packages them into a game. This can take a while depending on your internet speeds.
+8. Enjoy!
 
 #### [For any questions or feedback, please visit our Discord.](https://discord.gg/DE9Hn7T)
