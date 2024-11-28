@@ -25,7 +25,7 @@ The development build contains all the latest boards and changes to CSWT. It is 
 
 An alternative modpack that only contains boards that are in need of testing, to be assessed for whether or not they'll be included in Custom Street World Tour.
 
-#### [Download Latest Custom Street Testers Pack](https://nikkums.io/cswt/Modpacks/cswt_test.zip)
+#### [Download Latest Custom Street Testers Pack](https://nikkums.io/cswt/Modpacks/cstp.zip)
 
 ### Requirements
 
