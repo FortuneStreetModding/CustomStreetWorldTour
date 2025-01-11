@@ -19,7 +19,7 @@ Custom Street World Tour is an easy-to-install map pack for Fortune Street and B
 
 The development build contains all the latest boards and changes to CSWT. It is currently the only working and supported build of CSWT.
 
-#### [Download Latest Development Build](https://nikkums.io/cswt/Modpacks/cswt.zip)
+#### [Download Custom Street World Tour (Latest Development Build)](https://nikkums.io/cswt/Modpacks/cswt.zip)
 
 ### Custom Street Testers Pack
 
