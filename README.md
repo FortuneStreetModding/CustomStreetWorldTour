@@ -1,4 +1,4 @@
-[![CSWT Announcement Video](https://media.discordapp.net/attachments/708085079980900476/976518362295316510/FTDV7BlaIAAtYyq.jpg)](https://www.youtube.com/watch?v=FBLjEDI3qWQ)
+![CSWT Title](https://cdn.discordapp.com/attachments/1327433467486666862/1327442552269570048/CustomStreetWorldTourTitle.png?ex=678314b7&is=6781c337&hm=e359e493818e09509f191e38f2ae28884ce410d4dab9c6876c2e759e6c17a271&)
 
 Custom Street World Tour is an easy-to-install map pack for Fortune Street and Boom Street containing over a 150 custom boards from the [Custom Street Board Repository](https://fortunestreetmodding.github.io/maps), some including custom music and backgrounds.
 
