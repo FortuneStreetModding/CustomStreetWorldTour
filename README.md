@@ -5,7 +5,7 @@ Custom Street World Tour is an easy-to-install map pack for Fortune Street and B
 ### Changes to Base Game
 
 - Maximum board states increased from 4 to 99, with some boards using a large number of board states.
-- Game speed increased to 1.5x
+- Game speed increased to 1.5x.
 - New 'Event Squares' on certain boards that trigger certain venture cards when stepped on.
 - Increased the memory the AI has for lookahead calculation from 64kB to 128kB. This makes more complex boards more stable.
 - Tax Office price reduced from 10% to 5%.
@@ -13,7 +13,7 @@ Custom Street World Tour is an easy-to-install map pack for Fortune Street and B
 - Three Star Shop value change from 1000 to 500 and price changed from 200 to 100.
 - All boards & characters unlocked by default.
 - Improved balancing to make three-shop districts more viable and fair.
-- Memory Block minigame updated to make every block small
+- Memory Block minigame updated to make every block small (so there's always a risk of selecting the Bowser square).
 - Wiimmfi compatibility included!
 
 
