@@ -1,10 +1,11 @@
-![CSWT Title](https://cdn.discordapp.com/attachments/1327433467486666862/1327442552269570048/CustomStreetWorldTourTitle.png?ex=678314b7&is=6781c337&hm=e359e493818e09509f191e38f2ae28884ce410d4dab9c6876c2e759e6c17a271&)
+![CSWT Title](https://fortunestreetmodding.github.io/images/CustomStreetWorldTourTitle.webp)
 
 Custom Street World Tour is an easy-to-install map pack for Fortune Street and Boom Street containing over a 75 of the highest quality custom boards from our [Custom Street Board Repository](https://fortunestreetmodding.github.io/maps), mamany including custom music, backgrounds, and unique gameplay twists!
 
 ### Changes to Base Game
 
 - Maximum board states increased from 4 to 99, with some boards using a large number of board states.
+- Game speed increased to 1.5x
 - New 'Event Squares' on certain boards that trigger certain venture cards when stepped on.
 - Increased the memory the AI has for lookahead calculation from 64kB to 128kB. This makes more complex boards more stable.
 - Tax Office price reduced from 10% to 5%.
@@ -12,7 +13,8 @@ Custom Street World Tour is an easy-to-install map pack for Fortune Street and B
 - Three Star Shop value change from 1000 to 500 and price changed from 200 to 100.
 - All boards & characters unlocked by default.
 - Improved balancing to make three-shop districts more viable and fair.
-- Wiimfi compatibility included!
+- Memory Block minigame updated to make every block small
+- Wiimmfi compatibility included!
 
 
 ## Latest Development Build
